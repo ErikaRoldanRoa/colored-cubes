@@ -28,6 +28,11 @@ The script is deterministic: no randomness, no network, no floating point, and
 no dependencies outside the Python standard library. Runtime is about 30 s.
 """
 
+def check(condition, message):
+    """Verification gate. Unlike assert, this survives `python3 -O`."""
+    if not condition:
+        raise SystemExit("VERIFICATION FAILED: " + message)
+
 from itertools import combinations, product
 from collections import defaultdict, deque
 from math import comb
@@ -147,25 +152,25 @@ for edge, cubes in sorted(edge_to_cubes.items(), key=lambda x: sorted(x[0])):
 # Structural properties of M, asserted rather than merely printed.
 # These are exactly the five properties claimed in the paper's
 # "Computational verification" section; a failure here is a hard error.
-assert len(BA_CORNERS) == 8, f"M must have 8 vertices, got {len(BA_CORNERS)}"
-assert len(edges) == 20, f"M must have 20 edges, got {len(edges)}"
-assert n_parallel_pairs == 4, f"M must have 4 pairs of parallel edges, got {n_parallel_pairs}"
-assert is_bip, "M must be bipartite"
-assert all(degree[v] == 5 for v in BA_CORNERS), \
-    f"every vertex of M must have degree 5, got {dict(degree)}"
+check(len(BA_CORNERS) == 8, f"M must have 8 vertices, got {len(BA_CORNERS)}")
+check(len(edges) == 20, f"M must have 20 edges, got {len(edges)}")
+check(n_parallel_pairs == 4, f"M must have 4 pairs of parallel edges, got {n_parallel_pairs}")
+check(is_bip, "M must be bipartite")
+check(all(degree[v] == 5 for v in BA_CORNERS),
+      f"every vertex of M must have degree 5, got {dict(degree)}")
 
 # Every edge joins two DISTINCT corner numbers, so M is loopless by construction.
 # The substantive claim underneath that is about the cube data itself: for the target Ba,
 # every other cube shares either 0 or exactly 2 corner numbers with it, and Ba shares 8
 # with itself. That is what makes "edge" well defined, and it is checked here.
 _ucc = {name: len(set(corners) & BA_CORNERS) for name, corners in ALL_CUBES.items()}
-assert _ucc['Ba'] == 8, f"the target must share all 8 of its corner numbers with itself, got {_ucc['Ba']}"
-assert all(u in (0, 2) for n, u in _ucc.items() if n != 'Ba'), \
-    f"every non-target cube must have usable corner count 0 or 2, got {_ucc}"
+check(_ucc['Ba'] == 8, f"the target must share all 8 of its corner numbers with itself, got {_ucc['Ba']}")
+check(all(u in (0, 2) for n, u in _ucc.items() if n != 'Ba'),
+      f"every non-target cube must have usable corner count 0 or 2, got {_ucc}")
 _n_unusable = sum(1 for n, u in _ucc.items() if n != 'Ba' and u == 0)
-assert _n_unusable == 9, f"exactly 9 cubes must be unusable for Ba, got {_n_unusable}"
-assert len(ALL_CUBES) == 30, f"there must be 30 MacMahon cubes, got {len(ALL_CUBES)}"
-assert _n_unusable + len(edges) + 1 == 30, "unusable + usable + target must account for all 30 cubes"
+check(_n_unusable == 9, f"exactly 9 cubes must be unusable for Ba, got {_n_unusable}")
+check(len(ALL_CUBES) == 30, f"there must be 30 MacMahon cubes, got {len(ALL_CUBES)}")
+check(_n_unusable + len(edges) + 1 == 30, "unusable + usable + target must account for all 30 cubes")
 
 print("\nStructural assertions on M: PASS "
       "(8 vertices, 20 edges, 4 parallel pairs, bipartite, 5-regular).")
@@ -303,7 +308,7 @@ for combo in combinations(all_21, 8):
     if total % 50000 == 0:
         print(f"  Processed {total}...")
 
-assert total == comb(21, 8) == 203490, f"expected C(21,8)=203,490 collections, enumerated {total}"
+check(total == comb(21, 8) == 203490, f"expected C(21,8)=203,490 collections, enumerated {total}")
 
 nonzero_graph = sum(v for k,v in dist_graph.items() if k > 0)
 nonzero_brute = sum(v for k,v in dist_brute.items() if k > 0)
@@ -328,7 +333,7 @@ for sn in sorted(dist_graph):
     if sn > 0:
         print(f"  Solution number {sn:3d}: {dist_graph[sn]:6d}")
 
-# The distribution published in the paper's Table 1, transcribed for comparison.
+# The distribution published in the paper (table label SolnDist), transcribed for comparison.
 paper = {2: 93000, 4: 15987, 6: 2664, 8: 19860, 10: 792, 12: 1296, 16: 81}
 
 print("\n" + "="*70)
@@ -361,6 +366,12 @@ if mismatches:
     if len(mismatches) > 5:
         print(f"  ... and {len(mismatches) - 5} more.")
 
+# The headline claim of the paper's verification section. Gated AFTER the diagnostic
+# block above, so a failing run shows its counterexamples before it exits non-zero.
+check(len(mismatches) == 0,
+      f"the graph formulas and the prime-product brute force disagree on {len(mismatches)} "
+      f"collection(s); the paper claims they agree on all {total}")
+
 print("\n" + "="*70)
 print("RESULT 5: THE ZERO-EDGE TREE CASES (k = 0)")
 print("="*70)
@@ -371,24 +382,28 @@ print("overlook, so they are checked here explicitly against the paper's lemmas.
 print("\n--- Three components, tree with k=0 ---")
 print("Paper's Lemma wTarget3components: solution number = 4(k+1), so 4 when k=0.")
 print(f"Collections found: {len(cases_3comp_k0)}")
-if cases_3comp_k0:
+check(len(cases_3comp_k0) == 1728,
+      f"expected 1,728 three-component k=0 collections, found {len(cases_3comp_k0)}")
+if True:
     sols_3 = set(s for _, s, _ in cases_3comp_k0)
     print(f"Prime-product brute force gives: {sols_3}")
     ok3 = (sols_3 == {4})
     print(f"Agrees with 4(0+1) = 4 on every collection? {ok3}")
-    assert ok3, f"Lemma wTarget3components fails at k=0: brute force gives {sols_3}, expected 4"
+    check(ok3, f"Lemma wTarget3components fails at k=0: brute force gives {sols_3}, expected 4")
     print(f"Example: {cases_3comp_k0[0][0]}")
     print(f"  Components (vertices, edges, is_tree): {cases_3comp_k0[0][2]}")
 
 print("\n--- Four components, tree with k=1, distribution (1,2,2,2) ---")
 print("Paper's Lemma wTfourcomponents: solution number = 8(k+1), so 16 when k=1.")
 print(f"Collections found: {len(cases_4comp_1222)}")
-if cases_4comp_1222:
+check(len(cases_4comp_1222) == 8,
+      f"expected 8 collections of distribution (1,2,2,2), found {len(cases_4comp_1222)}")
+if True:
     sols_1222 = set(s for _, s, _ in cases_4comp_1222)
     print(f"Prime-product brute force gives: {sols_1222}")
     ok1222 = (sols_1222 == {16})
     print(f"Agrees with 8(1+1) = 16 on every collection? {ok1222}")
-    assert ok1222, f"Lemma wTfourcomponents fails at k=1: brute force gives {sols_1222}, expected 16"
+    check(ok1222, f"Lemma wTfourcomponents fails at k=1: brute force gives {sols_1222}, expected 16")
     print(f"Example: {cases_4comp_1222[0][0]}")
     print(f"  Components (vertices, edges, is_tree): {cases_4comp_1222[0][2]}")
 
@@ -397,12 +412,14 @@ print("Paper's Lemma wTfourcomponents: solution number = 8(k+1), so 8 when k=0."
 print("Structure: Ba sits on the isolated vertex (1 way); two 2-cycles and one")
 print("3-edge unicyclic component each contribute a factor of 2, giving 1*2*2*2 = 8.")
 print(f"Collections found: {len(cases_4comp_0223)}")
-if cases_4comp_0223:
+check(len(cases_4comp_0223) == 24,
+      f"expected 24 collections of distribution (0,2,2,3), found {len(cases_4comp_0223)}")
+if True:
     sols_0223 = set(s for _, s, _ in cases_4comp_0223)
     print(f"Prime-product brute force gives: {sols_0223}")
     ok0223 = (sols_0223 == {8})
     print(f"Agrees with 8(0+1) = 8 on every collection? {ok0223}")
-    assert ok0223, f"Lemma wTfourcomponents fails at k=0: brute force gives {sols_0223}, expected 8"
+    check(ok0223, f"Lemma wTfourcomponents fails at k=0: brute force gives {sols_0223}, expected 8")
     print(f"Example: {cases_4comp_0223[0][0]}")
     print(f"  Components (vertices, edges, is_tree): {cases_4comp_0223[0][2]}")
 
@@ -418,10 +435,10 @@ for ed in sorted(edge_dist_summary):
 
 # Post-correction consistency check
 print()
-print("POST-CORRECTION CONSISTENCY CHECK:")
+print("CONSISTENCY CHECK:")
 match_direct = all(paper.get(sn,0) == dist_brute.get(sn,0) for sn in all_sns)
-print(f"  Paper Table 1 == brute force? {match_direct}")
-assert match_direct, "Paper Table 1 does NOT match brute force. Did the paper's Table 1 drift?"
+print(f"  Paper distribution table == brute force? {match_direct}")
+check(match_direct, "Paper Table 1 does NOT match brute force. Did the paper's Table 1 drift?")
 
 print("\n" + "="*70)
 # ============================================================
@@ -432,15 +449,21 @@ import csv as _csv
 import os as _os
 
 _out = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "solution_number_distribution.csv")
-with open(_out, "w", newline="") as _fh:
+try:
+    _fh = open(_out, "w", newline="")
+except OSError as _e:
+    print(f"\n(Could not write {_os.path.basename(_out)}: {_e}. Verification itself is unaffected.)")
+    _fh = None
+if _fh is not None:
+  with _fh:
     _w = _csv.writer(_fh)
     _w.writerow(["solution_number", "num_collections_brute_force",
                  "num_collections_graph_formula", "num_collections_in_paper"])
     for _sn in sorted(k for k in dist_brute if k > 0):
         _w.writerow([_sn, dist_brute[_sn], dist_graph.get(_sn, 0), paper.get(_sn, "")])
     _w.writerow(["total", nonzero_brute, nonzero_graph, sum(paper.values())])
-print(f"\nWrote {_os.path.basename(_out)} "
-      f"({len(paper)} solution numbers, {nonzero_brute:,} solvable collections).")
+    print(f"\nWrote {_os.path.basename(_out)} "
+          f"({len(paper)} solution numbers, {nonzero_brute:,} solvable collections).")
 
 print("FINAL SUMMARY")
 print("="*70)
@@ -451,7 +474,7 @@ print(f"""
    {n_parallel_pairs} pairs of parallel edges, bipartite={is_bip},
    every vertex of degree {min(degree.values())}. Asserted above.
 
-2. TABLE 1 of the paper: reproduced on all {len(paper)} solution numbers?
+2. Distribution table of the paper (label SolnDist): reproduced on all {len(paper)} solution numbers?
    {_table_ok}. Total solvable collections = {nonzero_brute:,}.
 
 3. Lemma wTfourcomponents, solution number 8(k+1):
@@ -461,7 +484,7 @@ print(f"""
 4. Lemma wTarget3components, solution number 4(k+1):
    - k=0, distribution (0,a,7-a), a in {{2,3}}: {len(cases_3comp_k0):,} collections, all sol=4.
 
-5. CROSS-VALIDATION: the graph-theoretic formulas and the prime-product brute
-   force of arXiv:2407.13208 agree on all {total:,} usable-for-Ba
-   collections. Mismatches: {len(mismatches)}.
+5. CROSS-VALIDATION: graph-theoretic formulas vs the prime-product brute force of
+   arXiv:2407.13208, over all {total:,} usable-for-Ba collections.
+   Mismatches: {len(mismatches)}.
 """)

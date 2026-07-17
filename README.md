@@ -3,7 +3,11 @@
 Companion verification code for
 
 > Inga Johnson and Erika Roldán Roa, *Solution Numbers for Eight Blocks to Madness Puzzle*.
-> Preprint: [arXiv:2407.13208](https://arxiv.org/abs/2407.13208).
+
+The results verified here first appeared in the preprint
+[arXiv:2407.13208](https://arxiv.org/abs/2407.13208); the journal version is in preparation, and this
+code tracks the journal version's statements, which differ from the preprint in the four-component
+case and in one table. Where the two disagree, this repository follows the journal version.
 
 `verify_graph_M.py` independently re-computes the paper's structural and numerical claims about the
 graph $M$ and the distribution of solution numbers, by two methods that share only their input data.
@@ -32,16 +36,18 @@ component (a tree with $k = 0$ is a single vertex, occupied by the target itself
 ## What the script checks
 
 Enumerating all $\binom{21}{8} = 203{,}490$ collections of eight cubes drawn from the 21 cubes usable
-for $\mathrm{Ba}$ — the 20 above together with $\mathrm{Ba}$ itself:
+for $\mathrm{Ba}$ — the 20 above together with $\mathrm{Ba}$ itself. (Note that $\binom{21}{8}$ counts
+*every* such collection; only $\binom{20}{7} = 77{,}520$ of them actually contain $\mathrm{Ba}$.)
 
 | Claim | How it is checked |
 |---|---|
-| $M$ has 8 vertices, 20 edges, four pairs of parallel edges, is bipartite, is 5-regular, and has no loops | Built from the cube colourings; **asserted**, so a failure stops the run |
+| $M$ has 8 vertices, 20 edges, four pairs of parallel edges, is bipartite, and is 5-regular | Built from the cube colourings; **checked**, so a failure stops the run. ($M$ is loopless by construction: an edge joins the two *distinct* corner numbers a cube shares with the target.) |
+| The cube data itself: the target shares all 8 of its corner numbers with itself, every other cube shares exactly 0 or 2, and exactly 9 of the 30 cubes are unusable for the target | Computed from the colourings; **checked** |
 | The distribution of solution numbers over the $133{,}680$ solvable collections (the paper's distribution table — Table 2 in the current draft) | Full enumeration by the prime-product method, compared entry by entry |
-| The theorem for target-free collections: solution number $= 2^{n}$ | Graph component/tree analysis vs. brute force, on every collection |
+| The theorem for target-free collections: solution number $= 2^{n}$ | Graph component/tree analysis vs. brute force on every collection; agreement is **checked**, not merely reported |
 | The theorem for target-containing collections: $8$, $2(k{+}1)$, $4(k{+}1)$, $8(k{+}1)$ for $n = 1,2,3,4$ | Graph component/tree analysis vs. brute force, on every collection |
-| The three-component lemma at $k = 0$: exactly $1{,}728$ collections, all with solution number $4$ | Filtered from the enumeration; asserted |
-| The four-component lemma at $k = 0$: exactly $24$ collections, all with solution number $8$ | Filtered from the enumeration; asserted |
+| The three-component lemma at $k = 0$: exactly $1{,}728$ collections, all with solution number $4$ | Filtered from the enumeration; both the count and the value are **checked** |
+| The four-component lemma at $k = 0$: exactly $24$ collections, all with solution number $8$ | Filtered from the enumeration; both the count and the value are **checked** |
 
 **Scope.** This repository covers the paper above only. It does not cover the companion work on
 universal sets and buildability distributions, nor does it re-derive every incidental number in the
@@ -68,10 +74,12 @@ python3 verify_graph_M.py
 Python 3.8 or later. No dependencies — standard library only, no NumPy, no NetworkX. Deterministic:
 no randomness, no network access, no floating-point arithmetic. Runtime ≈ 30 s.
 
-You should see, in order: the structure of $M$ and `Structural assertions on M: PASS`; the
-distribution table with a `YES` in every comparison column; `Total mismatches: 0`; the $k = 0$ case
-counts ($1{,}728$ and $24$); and a final summary. Any assertion failure is a genuine disagreement
-with the paper and is worth reporting.
+You should see, in order: the structure of $M$, then `Structural assertions on M: PASS` and
+`Cube-data assertions: PASS`; the distribution table with a `YES` in every comparison column;
+`Total mismatches: 0`; the $k = 0$ case counts ($1{,}728$ and $24$); and a final summary. Every
+check is a hard gate — a failure aborts the run with `VERIFICATION FAILED: …` and a non-zero exit
+status, and is a genuine disagreement with the paper worth reporting. (The gates are ordinary
+conditionals, not `assert`, so they are not silently removed by `python3 -O`.)
 
 The run also writes **`solution_number_distribution.csv`** — the distribution by both methods
 alongside the published values, so a run can be diffed against the paper directly. A committed copy

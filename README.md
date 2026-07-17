@@ -72,7 +72,12 @@ python3 verify_graph_M.py
 ```
 
 Python 3.8 or later. No dependencies — standard library only, no NumPy, no NetworkX. Deterministic:
-no randomness, no network access, no floating-point arithmetic. Runtime ≈ 30 s.
+no randomness, no network access, no floating-point arithmetic.
+
+It is single-threaded and CPU-bound: about 30 s on an idle Apple M2, and proportionally longer on a
+busy or thermally throttled machine (we have measured the same build at anything from 28 s to 80 s
+on one laptop depending only on how warm it was). Expect roughly a minute; nothing is wrong if it
+takes two.
 
 You should see, in order: the structure of $M$, then `Structural assertions on M: PASS` and
 `Cube-data assertions: PASS`; the distribution table with a `YES` in every comparison column;

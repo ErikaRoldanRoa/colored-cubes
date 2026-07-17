@@ -153,9 +153,24 @@ assert n_parallel_pairs == 4, f"M must have 4 pairs of parallel edges, got {n_pa
 assert is_bip, "M must be bipartite"
 assert all(degree[v] == 5 for v in BA_CORNERS), \
     f"every vertex of M must have degree 5, got {dict(degree)}"
-assert not any(a == b for (a, b) in edges.values()), "M must have no loops"
+
+# Every edge joins two DISTINCT corner numbers, so M is loopless by construction.
+# The substantive claim underneath that is about the cube data itself: for the target Ba,
+# every other cube shares either 0 or exactly 2 corner numbers with it, and Ba shares 8
+# with itself. That is what makes "edge" well defined, and it is checked here.
+_ucc = {name: len(set(corners) & BA_CORNERS) for name, corners in ALL_CUBES.items()}
+assert _ucc['Ba'] == 8, f"the target must share all 8 of its corner numbers with itself, got {_ucc['Ba']}"
+assert all(u in (0, 2) for n, u in _ucc.items() if n != 'Ba'), \
+    f"every non-target cube must have usable corner count 0 or 2, got {_ucc}"
+_n_unusable = sum(1 for n, u in _ucc.items() if n != 'Ba' and u == 0)
+assert _n_unusable == 9, f"exactly 9 cubes must be unusable for Ba, got {_n_unusable}"
+assert len(ALL_CUBES) == 30, f"there must be 30 MacMahon cubes, got {len(ALL_CUBES)}"
+assert _n_unusable + len(edges) + 1 == 30, "unusable + usable + target must account for all 30 cubes"
+
 print("\nStructural assertions on M: PASS "
-      "(8 vertices, 20 edges, 4 parallel pairs, bipartite, 5-regular, loopless).")
+      "(8 vertices, 20 edges, 4 parallel pairs, bipartite, 5-regular).")
+print("Cube-data assertions: PASS "
+      "(30 cubes; usable corner count 8 for Ba, 0 or 2 for the rest; 9 unusable, 20 usable).")
 
 # ============================================================
 # 3. GRAPH-BASED SOLUTION NUMBER (paper's formula)

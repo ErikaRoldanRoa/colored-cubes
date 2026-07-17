@@ -1,0 +1,9 @@
+solution_number,num_collections_brute_force,num_collections_graph_formula,num_collections_in_paper
+2,93000,93000,93000
+4,15987,15987,15987
+6,2664,2664,2664
+8,19860,19860,19860
+10,792,792,792
+12,1296,1296,1296
+16,81,81,81
+total,133680,133680,133680

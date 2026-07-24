@@ -19,7 +19,9 @@ solution number by two methods that share only their input data:
 It reports:
   1. the structure of M -- asserted, not merely printed;
   2. the distribution of solution numbers over the 133,680 solvable collections,
-     compared against the paper's Table 1;
+     compared against the paper's distribution table (label SolnDist, which
+     typesets as Table 2; Table 1 is ContainsT, the components table inside
+     Theorem 2 -- the labels are the addresses, the numbers are not);
   3. agreement between methods A and B across all 203,490 collections;
   4. the two cases where the tree component has no edges (k = 0), which the
      paper's lemmas cover and which are easy to overlook.
@@ -438,7 +440,7 @@ print()
 print("CONSISTENCY CHECK:")
 match_direct = all(paper.get(sn,0) == dist_brute.get(sn,0) for sn in all_sns)
 print(f"  Paper distribution table == brute force? {match_direct}")
-check(match_direct, "Paper Table 1 does NOT match brute force. Did the paper's Table 1 drift?")
+check(match_direct, "Paper distribution table (SolnDist) does NOT match brute force. Did it drift?")
 
 print("\n" + "="*70)
 # ============================================================

@@ -94,8 +94,13 @@ whatever the hash seed; `expected_output.txt` is a committed copy of it:
 python3 verify_graph_M.py | diff - expected_output.txt
 ```
 
-The run also writes **`solution_number_distribution.csv`**: the distribution by both methods
-alongside the published values. A committed copy of that file is the expected output.
+With `--out PATH` the run also writes the distribution of solution numbers by both methods,
+alongside the published values, as a CSV file; **`solution_number_distribution.csv`** is the
+committed copy. A plain run writes no file, so the committed copy is never overwritten:
+
+```
+python3 verify_graph_M.py --out /tmp/run.csv && cmp /tmp/run.csv solution_number_distribution.csv
+```
 
 ### One command per claim
 

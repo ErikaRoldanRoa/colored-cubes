@@ -42,10 +42,20 @@ def check(condition, message):
     if not condition:
         raise SystemExit("VERIFICATION FAILED: " + message)
 
+import argparse
+import csv
+import sys
 from itertools import combinations, permutations, product
 from collections import defaultdict, deque
 from fractions import Fraction
 from math import comb
+
+_parser = argparse.ArgumentParser(
+    description="Verify the claims of 'Solution Numbers for Eight Blocks to Madness, Part 1'.")
+_parser.add_argument("--out", metavar="PATH",
+                     help="also write the distribution of solution numbers, by both methods "
+                          "and as published, to the CSV file PATH")
+ARGS = _parser.parse_args()
 
 # ============================================================
 # 1. THE 30 MACMAHON CUBES, in Conway's tableau naming.
@@ -641,30 +651,6 @@ check(f"{float(p_build):.4f}" == "0.0228", f"p = {float(p_build)} does not round
 print(f"C4. p = 133680/5852925 = {p_build} = {float(p_build):.6f}, about 0.0228: PASS.")
 
 print("\n" + "="*70)
-# ============================================================
-# Emit the machine-readable data behind the paper's distribution table,
-# so a reader can diff a run against the published numbers directly.
-# ============================================================
-import csv as _csv
-import os as _os
-
-_out = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "solution_number_distribution.csv")
-try:
-    _fh = open(_out, "w", newline="")
-except OSError as _e:
-    print(f"\n(Could not write {_os.path.basename(_out)}: {_e}. Verification itself is unaffected.)")
-    _fh = None
-if _fh is not None:
-  with _fh:
-    _w = _csv.writer(_fh)
-    _w.writerow(["solution_number", "num_collections_brute_force",
-                 "num_collections_graph_formula", "num_collections_in_paper"])
-    for _sn in sorted(k for k in dist_brute if k > 0):
-        _w.writerow([_sn, dist_brute[_sn], dist_graph.get(_sn, 0), paper.get(_sn, "")])
-    _w.writerow(["total", nonzero_brute, nonzero_graph, sum(paper.values())])
-    print(f"\nWrote {_os.path.basename(_out)} "
-          f"({len(paper)} solution numbers, {nonzero_brute:,} solvable collections).")
-
 print("FINAL SUMMARY")
 print("="*70)
 _table_ok = all(paper[sn] == dist_brute.get(sn, 0) for sn in paper) and \
@@ -696,3 +682,22 @@ print(f"""
    - for Ba: 81 = 1 + 8 + {len(sol16_n3)}, with {len(sol16_n3)} = 6 x 12;
    - p = 133680/5852925 = {float(p_build):.4f}.
 """)
+
+# ============================================================
+# 8. OPTIONAL CSV: the data behind the paper's distribution table, so a run can
+#    be compared with solution_number_distribution.csv. Written only with --out;
+#    the message goes to stderr, so the printed output does not depend on it.
+# ============================================================
+if ARGS.out:
+    try:
+        with open(ARGS.out, "w", newline="") as fh:
+            w = csv.writer(fh)
+            w.writerow(["solution_number", "num_collections_brute_force",
+                        "num_collections_graph_formula", "num_collections_in_paper"])
+            for sn in sorted(k for k in dist_brute if k > 0):
+                w.writerow([sn, dist_brute[sn], dist_graph.get(sn, 0), paper.get(sn, "")])
+            w.writerow(["total", nonzero_brute, nonzero_graph, sum(paper.values())])
+    except OSError as e:
+        sys.exit(f"Verification passed, but {ARGS.out} could not be written: {e}")
+    print(f"Wrote {ARGS.out} ({len(paper)} solution numbers, "
+          f"{nonzero_brute:,} solvable collections).", file=sys.stderr)

@@ -152,8 +152,6 @@ C3. Target Ba: 81 collections with solution number 16 = 1 without Ba (the four
 C4. p = 133680/5852925 = 8912/390195 = 0.022840, about 0.0228: PASS.
 
 ======================================================================
-
-Wrote solution_number_distribution.csv (7 solution numbers, 133,680 solvable collections).
 FINAL SUMMARY
 ======================================================================
 

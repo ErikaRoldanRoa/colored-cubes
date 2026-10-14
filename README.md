@@ -118,7 +118,7 @@ all at once, run `python3 verify_graph_M.py > run.txt` once and apply each filte
 | Table 2 | `python3 verify_graph_M.py \| sed -n '/^RESULT 3/,/^Total/p'` |
 | Both theorems, on every collection | `python3 verify_graph_M.py \| grep 'Total mismatches'` |
 | The $1{,}728$ and $24$ collections with $k = 0$ | `python3 verify_graph_M.py \| grep -A7 'tree with k=0'` |
-| The 30 cubes rebuilt from the colorings | `python3 verify_graph_M.py \| grep -A2 '^C1\.'` |
+| The 30 cubes rebuilt from the colorings | `python3 verify_graph_M.py \| grep -A4 '^C1\.'` |
 | Table 2 and the 1 + 80 split for all 30 targets | `python3 verify_graph_M.py \| grep -A4 '^C2\.'` |
 | The 81 collections with solution number 16, and $72 = 6 \times 12$ | `python3 verify_graph_M.py \| grep -A3 '^D1\.'` |
 | The corollary's $p$ | `python3 verify_graph_M.py \| grep '^D2\.'` |

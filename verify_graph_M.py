@@ -25,9 +25,10 @@ It reports:
   5. method C, which does not use the corner-number table: the 30 cubes rebuilt
      from the 720 face colorings and the 24 rotations, compared with the table
      as sets of corner numbers; and, for all 30 targets, the distribution of
-     solution numbers and the 1 + 80 split of the 81 collections with solution
-     number 16, computed by placing colored cubes in the corners of the 2x2x2
-     block;
+     solution numbers (also over the collections containing the target, compared
+     with methods A and B for Ba) and the 1 + 80 split of the 81 collections with
+     solution number 16, computed by placing colored cubes in the corners of the
+     2x2x2 block;
   6. for Ba, the 81 collections with solution number 16 (1 + 8 + 72, with
      72 = 6 x 12), and the corollary's p = 133680/5852925.
 
@@ -331,6 +332,7 @@ print(f"C(21,8) = {comb(21,8)} (only usable cubes for Ba)")
 
 dist_graph = defaultdict(int)
 dist_brute = defaultdict(int)
+dist_brute_with_ba = defaultdict(int)   # solvable collections containing Ba, by solution number
 mismatches = []
 cases_3comp_k0 = []
 cases_4comp_0223 = []
@@ -357,6 +359,7 @@ for combo in combinations(all_21, 8):
         sol16.append((combo, ba_in, ncomp, ktree))
 
     if ba_in and sol_b > 0:
+        dist_brute_with_ba[sol_b] += 1
         edge_dist = sorted([ne for _,ne,_ in cdet])
         if ncomp == 3 and ntrees == 1 and ktree == 0:
             cases_3comp_k0.append((combo, sol_b, cdet))
@@ -633,17 +636,27 @@ def solution_distribution(target_index):
     extend(0, 0, {0: 1}, False)
     return len(usable), dict(dist), dict(with_target)
 
+# For every target, the distribution over the collections that contain it must also equal
+# the one methods A and B give for Ba, which links method C to them beyond Table 2.
+_with_ba = dict(dist_brute_with_ba)
 _bad_targets = []
-for _t in range(30):
+_solved = set()
+for _t in range(len(REBUILT)):
     _nu, _d, _w = solution_distribution(_t)
-    if not (_nu == 21 and _d == paper and _w.get(16, 0) == 80 and _d[16] - _w.get(16, 0) == 1):
+    if (_nu == 21 and _d == paper and _w == _with_ba and _w.get(16, 0) == 80
+            and _d.get(16, 0) - _w.get(16, 0) == 1):
+        _solved.add(REBUILT[_t][0])
+    else:
         _bad_targets.append((_t, _nu, _d, _w))
 check(not _bad_targets,
-      f"{len(_bad_targets)} target(s) do not reproduce Table 2 and the 1/80 split, "
+      f"{len(_bad_targets)} target(s) do not reproduce Table 2 and the 1 + 80 split, "
       f"first: {_bad_targets[:1]}")
+check(len(_solved) == 30, f"expected 30 distinct targets solved, got {len(_solved)}")
 print("C2. For each of the 30 targets: 21 usable cubes, and the distribution of solution")
-print("    numbers equals Table 2; of its 81 collections with solution number 16, 1 avoids")
-print("    the target and 80 contain it: PASS (all 30 targets).")
+print("    numbers equals Table 2; over the collections containing the target it equals")
+print("    the distribution methods A and B give over the collections containing Ba; of")
+print("    its 81 collections with solution number 16, 1 avoids the target and 80 contain")
+print("    it: PASS (all 30 targets).")
 
 # --- C3. The 81 collections with solution number 16, for the target Ba --------
 # (From the enumeration above and the graph M.)

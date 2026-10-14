@@ -149,8 +149,10 @@ C1. 720 colorings / 24 rotations = 30 cubes; their corner-number sets equal the
     the mirror cubes, also among the 30. The Conway names are checked only against
     the row, column and mirror structure of the tableau, above.)
 C2. For each of the 30 targets: 21 usable cubes, and the distribution of solution
-    numbers equals Table 2; of its 81 collections with solution number 16, 1 avoids
-    the target and 80 contain it: PASS (all 30 targets).
+    numbers equals Table 2; over the collections containing the target it equals
+    the distribution methods A and B give over the collections containing Ba; of
+    its 81 collections with solution number 16, 1 avoids the target and 80 contain
+    it: PASS (all 30 targets).
 C3. Target Ba: 81 collections with solution number 16 = 1 without Ba (the four
     diagonal pairs Ac, Ad, Ae, Af, Cb, Db, Eb, Fb) + 8 with four components + 72 with
     three components; 72 = 6 x 12 (two diagonal pairs, then a spanning path of

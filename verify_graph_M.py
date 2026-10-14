@@ -145,7 +145,7 @@ is_bip, part0, part1 = check_bipartite(sorted(BA_CORNERS), sorted(unique_edges_l
 print("="*70)
 print("GRAPH M STRUCTURE")
 print("="*70)
-print(f"Vertices: {len(BA_CORNERS)} — {sorted(BA_CORNERS)}")
+print(f"Vertices ({len(BA_CORNERS)}): {sorted(BA_CORNERS)}")
 print(f"Edges (cubes): {len(edges)}")
 print(f"Distinct vertex pairs: {len(edge_to_cubes)}")
 print(f"Bipartite: {is_bip}")

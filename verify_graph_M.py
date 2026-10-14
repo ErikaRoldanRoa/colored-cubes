@@ -23,10 +23,10 @@ It reports:
   4. the two cases where the tree component has no edges (k = 0), which the
      paper's lemmas cover and which are easy to overlook;
   5. method C, which does not use the corner-number table: the 30 cubes rebuilt
-     from the 720 face colourings and the 24 rotations, compared with the table
+     from the 720 face colorings and the 24 rotations, compared with the table
      as sets of corner numbers; and, for all 30 targets, the distribution of
      solution numbers and the 1 + 80 split of the 81 collections with solution
-     number 16, computed by placing coloured cubes in the corners of the 2x2x2
+     number 16, computed by placing colored cubes in the corners of the 2x2x2
      block;
   6. for Ba, the 81 collections with solution number 16 (1 + 8 + 72, with
      72 = 6 x 12), and the corollary's p = 133680/5852925.
@@ -64,7 +64,7 @@ ARGS = _parser.parse_args()
 #    Taken from the authors' dataset: C36.csv in
 #    github.com/IJohnson-math/Colored_Cube_Puzzles, also printed as Table 3 of
 #    arXiv:2407.13208. Method C (section 7 below) rebuilds the 30 cubes from
-#    their face colourings and compares them with this table.
+#    their face colorings and compares them with this table.
 # ============================================================
 
 ALL_CUBES = {
@@ -466,8 +466,8 @@ check(match_direct, "Table 2 of the paper (SolnDist) does not match the brute-fo
 
 # ============================================================
 # 7. METHOD C AND FURTHER COUNTS
-#    C1, C2 (method C): the 30 cubes are rebuilt from their face colourings, and
-#    every target is solved by placing coloured cubes in the corners of the
+#    C1, C2 (method C): the 30 cubes are rebuilt from their face colorings, and
+#    every target is solved by placing colored cubes in the corners of the
 #    2x2x2 block. Nothing in C1 and C2 reads the corner-number table above,
 #    except to compare with it at the end of C1.
 #    C3, C4: the counts of the 81 collections with solution number 16 and the
@@ -475,11 +475,11 @@ check(match_direct, "Table 2 of the paper (SolnDist) does not match the brute-fo
 # ============================================================
 
 print("\n" + "="*70)
-print("METHOD C (C1, C2: from the face colourings) AND FURTHER COUNTS (C3, C4)")
+print("METHOD C (C1, C2: from the face colorings) AND FURTHER COUNTS (C3, C4)")
 print("="*70)
 
 # --- C1. The 30 MacMahon cubes, rebuilt -------------------------------------
-# A colouring lists the colours 1..6 of the faces in the directions of FACES.
+# A coloring lists the colors 1..6 of the faces in the directions of FACES.
 FACES = [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
 FACE_INDEX = {f: i for i, f in enumerate(FACES)}
 OCTANTS = list(product((1, -1), repeat=3))   # the 8 corners of a cube, and of the block
@@ -503,34 +503,34 @@ for _p in permutations(range(3)):
                 for f in FACES))
 check(len(set(FACE_PERMS)) == 24, f"expected 24 rotations of the cube, got {len(set(FACE_PERMS))}")
 
-def rotate(colouring, perm):
+def rotate(coloring, perm):
     out = [0] * 6
     for i in range(6):
-        out[perm[i]] = colouring[i]
+        out[perm[i]] = coloring[i]
     return tuple(out)
 
-def corner_number(colouring, s):
-    """The colours around corner s, read clockwise as seen from outside the cube,
+def corner_number(coloring, s):
+    """The colors around corner s, read clockwise as seen from outside the cube,
     starting with the smallest. (Reading counterclockwise instead turns each cube
     into its mirror cube, which is also one of the 30, so the comparison with the
     table in C1 does not depend on the reading direction.)"""
-    a = colouring[FACE_INDEX[(s[0], 0, 0)]]
-    b = colouring[FACE_INDEX[(0, s[1], 0)]]
-    c = colouring[FACE_INDEX[(0, 0, s[2])]]
+    a = coloring[FACE_INDEX[(s[0], 0, 0)]]
+    b = coloring[FACE_INDEX[(0, s[1], 0)]]
+    c = coloring[FACE_INDEX[(0, 0, s[2])]]
     if s[0] * s[1] * s[2] == 1:   # here x, y, z run counterclockwise
         b, c = c, b
     t = [a, b, c]
     i = t.index(min(t))
     return "".join(str(x) for x in t[i:] + t[:i])
 
-# All 6! = 720 colourings with six distinct colours, grouped into rotation classes.
+# All 6! = 720 colorings with six distinct colors, grouped into rotation classes.
 _classes = {}
 for _col in permutations(range(1, 7)):
     _orbit = frozenset(rotate(_col, p) for p in FACE_PERMS)
     _classes[min(_orbit)] = _orbit
-check(len(_classes) == 30, f"expected 30 rotation classes of the 720 colourings, got {len(_classes)}")
-check(all(len(o) == 24 for o in _classes.values()), "every rotation class must have 24 colourings")
-REBUILT = [sorted(_classes[r]) for r in sorted(_classes)]   # 30 cubes, each as its 24 colourings
+check(len(_classes) == 30, f"expected 30 rotation classes of the 720 colorings, got {len(_classes)}")
+check(all(len(o) == 24 for o in _classes.values()), "every rotation class must have 24 colorings")
+REBUILT = [sorted(_classes[r]) for r in sorted(_classes)]   # 30 cubes, each as its 24 colorings
 
 def corner_set(cube):
     sets = {frozenset(corner_number(col, s) for s in OCTANTS) for col in cube}
@@ -540,14 +540,14 @@ def corner_set(cube):
 rebuilt_sets = [corner_set(cube) for cube in REBUILT]
 table_sets = {frozenset(c) for c in ALL_CUBES.values()}
 check(len(set(rebuilt_sets)) == 30 and set(rebuilt_sets) == table_sets,
-      "the 30 cubes rebuilt from the colourings differ from the 30 cubes of the table")
-print("C1. 720 colourings / 24 rotations = 30 cubes; their corner-number sets equal the")
+      "the 30 cubes rebuilt from the colorings differ from the 30 cubes of the table")
+print("C1. 720 colorings / 24 rotations = 30 cubes; their corner-number sets equal the")
 print("    30 cubes of the table: PASS. (This checks the cubes as sets of corner numbers;")
 print("    it does not check which Conway name the table gives to each cube.)")
 
-# --- C2. Every target, solved by placing coloured cubes -----------------------
+# --- C2. Every target, solved by placing colored cubes -----------------------
 # In the 2x2x2 block, the small cube at corner s shows its faces in the directions
-# s[0]x, s[1]y, s[2]z on the outside; they must carry the target's colours there.
+# s[0]x, s[1]y, s[2]z on the outside; they must carry the target's colors there.
 def fits(target, cube, s):
     """Number of orientations in which `cube` can sit at corner s of the block."""
     faces = [FACE_INDEX[(s[0], 0, 0)], FACE_INDEX[(0, s[1], 0)], FACE_INDEX[(0, 0, s[2])]]
@@ -678,7 +678,7 @@ print(f"""
    Mismatches: {len(mismatches)}.
 
 6. METHOD C AND FURTHER COUNTS, all asserted above:
-   - the 30 cubes rebuilt from the 720 colourings equal the table's 30 cubes
+   - the 30 cubes rebuilt from the 720 colorings equal the table's 30 cubes
      as sets of corner numbers (the Conway names are not checked);
    - all 30 targets give the distribution of Table 2, and for each, 1 of its
      81 collections with solution number 16 avoids the target and 80 contain it;

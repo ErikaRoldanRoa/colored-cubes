@@ -10,23 +10,23 @@ above; where the paper corrects the preprint, the corrected statements are the o
 
 `verify_graph_M.py` re-computes the paper's structural and numerical claims about the graph $M$ and
 the distribution of solution numbers, by two methods that share only their input data (a table of
-corner numbers), and by a third that rebuilds the cubes from their colourings and does not use that
+corner numbers), and by a third that rebuilds the cubes from their colorings and does not use that
 table.
 
 ---
 
 ## The problem, in one paragraph
 
-The 30 **MacMahon cubes** are the cubes whose six faces are painted with six colours, each colour
+The 30 **MacMahon cubes** are the cubes whose six faces are painted with six colors, each color
 appearing at least once (up to rotation there are exactly $6!/24 = 30$). Fix one of them as the
 **target** $T$. The $2\times2\times2$ **target puzzle** asks for eight distinct MacMahon cubes that
-can be assembled into a $2\times2\times2$ block whose exterior is coloured like a magnified $T$;
+can be assembled into a $2\times2\times2$ block whose exterior is colored like a magnified $T$;
 interior faces need not match. A collection's **solution number** is the number of distinct ways its
 eight cubes can be arranged to do this. Of the $\binom{30}{8} = 5{,}852{,}925$ possible collections,
 exactly $133{,}680$ have a nonzero solution number for a given target.
 
 The paper answers this with a graph. Taking $T = \mathrm{Ba}$ (any target reduces to this one by
-recolouring), $M$ is the graph whose 8 vertices are $\mathrm{Ba}$'s corner numbers and whose 20 edges
+recoloring), $M$ is the graph whose 8 vertices are $\mathrm{Ba}$'s corner numbers and whose 20 edges
 are the 20 cubes sharing exactly two corner numbers with it. For a collection $W$, the subgraph
 $G_W \subseteq M$ determines the solution number from its component structure: throughout, **$n$** is
 the number of connected components of $G_W$, and **$k$** is the number of edges of its unique tree
@@ -50,8 +50,8 @@ usable for $\mathrm{Ba}$: the 20 above together with $\mathrm{Ba}$ itself. ($\bi
 | The three-component lemma at $k = 0$: exactly $1{,}728$ collections, all with solution number $4$ | Filtered from the enumeration; both the count and the value are **checked** |
 | The four-component lemma at $k = 0$: exactly $24$ collections, all with solution number $8$ | Filtered from the enumeration; both the count and the value are **checked** |
 | The 81 collections with solution number $16$: $1$ avoids $\mathrm{Ba}$ (the four diagonal pairs) and $80$ contain it, $80 = 8 + 72$, and $72 = 6 \times 12$ (two diagonal pairs, then a path of three cubes spanning the other four corner numbers) | Filtered from the enumeration, and the 72 rebuilt from $M$ as in the paper; **checked** |
-| **Method C.** The 30 MacMahon cubes: rebuilt from all $6! = 720$ colourings with six distinct colours, up to the 24 rotations, they are exactly the 30 cubes of the table | Compared as sets of corner numbers; **checked**. This does not check which Conway name the table gives to each cube (nor the reading direction of corner numbers: reading them the other way turns each cube into its mirror cube, also one of the 30). |
-| **Method C.** The same distribution (Table 2) for every one of the 30 targets, with 1 of the 81 maximal collections avoiding the target and 80 containing it | Every target solved by placing the coloured cubes in the corners of the $2\times2\times2$ block; **checked** |
+| **Method C.** The 30 MacMahon cubes: rebuilt from all $6! = 720$ colorings with six distinct colors, up to the 24 rotations, they are exactly the 30 cubes of the table | Compared as sets of corner numbers; **checked**. This does not check which Conway name the table gives to each cube (nor the reading direction of corner numbers: reading them the other way turns each cube into its mirror cube, also one of the 30). |
+| **Method C.** The same distribution (Table 2) for every one of the 30 targets, with 1 of the 81 maximal collections avoiding the target and 80 containing it | Every target solved by placing the colored cubes in the corners of the $2\times2\times2$ block; **checked** |
 | The corollary: $p = 133{,}680 / 5{,}852{,}925 \approx 0.0228$ | Exact fraction; **checked** |
 
 **Scope.** This repository covers the paper above only. It does not cover the companion work on
@@ -67,7 +67,7 @@ applies the paper's graph-theoretic formulas to the component structure of $G_W$
 prime-product algorithm of [arXiv:2407.13208](https://arxiv.org/abs/2407.13208) (Section 7),
 reimplemented here, which counts placements directly and uses none of the paper's graph theory. Both
 read the same table of corner numbers, so that table is a shared assumption. Method C removes it:
-it rebuilds the 30 cubes from their face colourings, compares them with the table, and then solves
+it rebuilds the 30 cubes from their face colorings, compares them with the table, and then solves
 every target by trying each cube in each corner of the $2\times2\times2$ block in each of its 24
 orientations; this count uses neither corner numbers nor graph theory. Along the way it checks that a
 cube fits a corner of the block exactly when it carries the target's corner number there, which is
@@ -114,7 +114,7 @@ Each command runs the full verification and prints the lines that state one clai
 | Table 2 | `python3 verify_graph_M.py \| sed -n '/^RESULT 3/,/^Total/p'` |
 | Both theorems, on every collection | `python3 verify_graph_M.py \| grep 'Total mismatches'` |
 | The $1{,}728$ and $24$ collections with $k = 0$ | `python3 verify_graph_M.py \| grep -A5 'tree with k=0'` |
-| The 30 cubes rebuilt from the colourings | `python3 verify_graph_M.py \| grep -A2 '^C1\.'` |
+| The 30 cubes rebuilt from the colorings | `python3 verify_graph_M.py \| grep -A2 '^C1\.'` |
 | Table 2 and the 1/80 split for all 30 targets | `python3 verify_graph_M.py \| grep -A2 '^C2\.'` |
 | The 81 collections with solution number 16, and $72 = 6 \times 12$ | `python3 verify_graph_M.py \| grep -A3 '^C3\.'` |
 | The corollary's $p$ | `python3 verify_graph_M.py \| grep '^C4\.'` |

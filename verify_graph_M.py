@@ -22,13 +22,14 @@ It reports:
   3. agreement between methods A and B across all 203,490 collections;
   4. the two cases where the tree component has no edges (k = 0), which the
      paper's lemmas cover and which are easy to overlook;
-  5. independent checks (method C) that do not use the corner-number table:
-     the 30 cubes rebuilt from the 720 face colourings and the 24 rotations,
-     compared with the table as sets of corner numbers; for all 30 targets, the
-     distribution of solution numbers, computed by placing coloured cubes in the
-     corners of the 2x2x2 block; the 1 + 80 split of the 81 collections with
-     solution number 16; the count 72 = 6 x 12; and the corollary's
-     p = 133680/5852925.
+  5. method C, which does not use the corner-number table: the 30 cubes rebuilt
+     from the 720 face colourings and the 24 rotations, compared with the table
+     as sets of corner numbers; and, for all 30 targets, the distribution of
+     solution numbers and the 1 + 80 split of the 81 collections with solution
+     number 16, computed by placing coloured cubes in the corners of the 2x2x2
+     block;
+  6. for Ba, the 81 collections with solution number 16 (1 + 8 + 72, with
+     72 = 6 x 12), and the corollary's p = 133680/5852925.
 
 No randomness, no network access, and no dependencies outside the Python
 standard library; every count is exact integer arithmetic, and the printed
@@ -464,15 +465,17 @@ print(f"  Table 2 of the paper == brute-force distribution? {match_direct}")
 check(match_direct, "Table 2 of the paper (SolnDist) does not match the brute-force distribution")
 
 # ============================================================
-# 7. INDEPENDENT CHECKS (method C)
-#    The 30 cubes are rebuilt from their face colourings, and every target is
-#    solved by placing coloured cubes in the corners of the 2x2x2 block. Nothing
-#    in C1, C2 and C4 reads the corner-number table above, except to compare
-#    with it at the end of C1.
+# 7. METHOD C AND FURTHER COUNTS
+#    C1, C2 (method C): the 30 cubes are rebuilt from their face colourings, and
+#    every target is solved by placing coloured cubes in the corners of the
+#    2x2x2 block. Nothing in C1 and C2 reads the corner-number table above,
+#    except to compare with it at the end of C1.
+#    C3, C4: the counts of the 81 collections with solution number 16 and the
+#    corollary.
 # ============================================================
 
 print("\n" + "="*70)
-print("INDEPENDENT CHECKS (method C: from the face colourings, all 30 targets)")
+print("METHOD C (C1, C2: from the face colourings) AND FURTHER COUNTS (C3, C4)")
 print("="*70)
 
 # --- C1. The 30 MacMahon cubes, rebuilt -------------------------------------
@@ -672,7 +675,7 @@ print(f"""
    arXiv:2407.13208 (Section 7), over all {total:,} usable-for-Ba collections.
    Mismatches: {len(mismatches)}.
 
-6. INDEPENDENT CHECKS (method C), all asserted above:
+6. METHOD C AND FURTHER COUNTS, all asserted above:
    - the 30 cubes rebuilt from the 720 colourings equal the table's 30 cubes
      as sets of corner numbers (the Conway names are not checked);
    - all 30 targets give the distribution of Table 2, and for each, 1 of its

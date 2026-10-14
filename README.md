@@ -9,7 +9,9 @@ The results checked here first appeared in the preprint
 above; where the paper corrects the preprint, the corrected statements are the ones checked.
 
 `verify_graph_M.py` re-computes the paper's structural and numerical claims about the graph $M$ and
-the distribution of solution numbers, by two methods that share only their input data.
+the distribution of solution numbers, by two methods that share only their input data (a table of
+corner numbers), and by a third that rebuilds the cubes from their colourings and does not use that
+table.
 
 ---
 
@@ -123,7 +125,7 @@ Each command runs the full verification and prints the lines that state one clai
 
 ```
 verify_graph_M.py                  The verifier: builds M, enumerates, cross-validates (methods A, B, C).
-solution_number_distribution.csv   Expected output: the distribution by both methods.
+solution_number_distribution.csv   Expected --out file: the distribution by methods A and B.
 expected_output.txt                Expected output: everything the verifier prints.
 README.md                          This file.
 LICENSE                            Tiered: code MIT · documentation CC-BY 4.0 · data CC-BY 4.0.

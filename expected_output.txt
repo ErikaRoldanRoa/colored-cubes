@@ -137,7 +137,7 @@ CONSISTENCY CHECK:
   Table 2 of the paper == brute-force distribution? True
 
 ======================================================================
-INDEPENDENT CHECKS (method C: from the face colourings, all 30 targets)
+METHOD C (C1, C2: from the face colourings) AND FURTHER COUNTS (C3, C4)
 ======================================================================
 C1. 720 colourings / 24 rotations = 30 cubes; their corner-number sets equal the
     30 cubes of the table: PASS. (This checks the cubes as sets of corner numbers;
@@ -173,7 +173,7 @@ FINAL SUMMARY
    arXiv:2407.13208 (Section 7), over all 203,490 usable-for-Ba collections.
    Mismatches: 0.
 
-6. INDEPENDENT CHECKS (method C), all asserted above:
+6. METHOD C AND FURTHER COUNTS, all asserted above:
    - the 30 cubes rebuilt from the 720 colourings equal the table's 30 cubes
      as sets of corner numbers (the Conway names are not checked);
    - all 30 targets give the distribution of Table 2, and for each, 1 of its

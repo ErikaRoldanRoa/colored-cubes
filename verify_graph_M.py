@@ -511,7 +511,9 @@ def rotate(colouring, perm):
 
 def corner_number(colouring, s):
     """The colours around corner s, read clockwise as seen from outside the cube,
-    starting with the smallest."""
+    starting with the smallest. (Reading counterclockwise instead turns each cube
+    into its mirror cube, which is also one of the 30, so the comparison with the
+    table in C1 does not depend on the reading direction.)"""
     a = colouring[FACE_INDEX[(s[0], 0, 0)]]
     b = colouring[FACE_INDEX[(0, s[1], 0)]]
     c = colouring[FACE_INDEX[(0, 0, s[2])]]

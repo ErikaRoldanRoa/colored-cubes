@@ -2,8 +2,8 @@
 """
 Companion verification code for
 
-    I. Johnson and E. Roldan Roa,
-    "Solution Numbers for Eight Blocks to Madness Puzzle".
+    Inga Johnson and Érika Roldán,
+    "Solution Numbers for Eight Blocks to Madness, Part 1".
 
 For the target cube Ba, this script independently checks the paper's structural
 and numerical claims by enumerating all C(21,8) = 203,490 collections of eight
@@ -12,16 +12,13 @@ solution number by two methods that share only their input data:
 
   A. the graph-theoretic formulas of the paper's two main theorems, applied to
      the component structure of the subgraph G_W of the graph M; and
-  B. the prime-product brute force of the authors' earlier preprint
-     (arXiv:2407.13208), which counts placements directly and uses none of the
-     paper's graph theory.
+  B. the prime-product algorithm of arXiv:2407.13208 (Section 7), reimplemented,
+     which counts placements directly and uses none of the paper's graph theory.
 
 It reports:
   1. the structure of M -- asserted, not merely printed;
   2. the distribution of solution numbers over the 133,680 solvable collections,
-     compared against the paper's distribution table (label SolnDist, which
-     typesets as Table 2; Table 1 is ContainsT, the components table inside
-     Theorem 2 -- the labels are the addresses, the numbers are not);
+     compared against Table 2 of the paper (label SolnDist);
   3. agreement between methods A and B across all 203,490 collections;
   4. the two cases where the tree component has no edges (k = 0), which the
      paper's lemmas cover and which are easy to overlook;
@@ -33,8 +30,11 @@ It reports:
      solution number 16; the count 72 = 6 x 12; and the corollary's
      p = 133680/5852925.
 
-The script is deterministic: no randomness, no network, no floating point, and
-no dependencies outside the Python standard library. Runtime is about 30 s.
+No randomness, no network access, and no dependencies outside the Python
+standard library; every count is exact integer arithmetic, and the printed
+output is the same on every run. Runtime is about 35 s.
+
+Usage:  python3 verify_graph_M.py [--out PATH]
 """
 
 def check(condition, message):
@@ -60,9 +60,10 @@ ARGS = _parser.parse_args()
 # ============================================================
 # 1. THE 30 MACMAHON CUBES, in Conway's tableau naming.
 #    Each cube is given by its eight corner numbers.
-#    Cross-checked against the cube data published alongside arXiv:2407.13208
-#    at github.com/IJohnson-math/Colored_Cube_Puzzles (C_36all.csv): all 30
-#    cubes agree.
+#    Taken from the authors' dataset: C36.csv in
+#    github.com/IJohnson-math/Colored_Cube_Puzzles, also printed as Table 3 of
+#    arXiv:2407.13208. Method C (section 7 below) rebuilds the 30 cubes from
+#    their face colourings and compares them with this table.
 # ============================================================
 
 ALL_CUBES = {
@@ -258,7 +259,7 @@ def analyze_subgraph(cube_names, ba_included):
         return (sol, n_comp, comp_details, n_trees, k_tree)
 
 # ============================================================
-# 4. BRUTE-FORCE SOLUTION NUMBER (prime product, Section 5)
+# 4. BRUTE-FORCE SOLUTION NUMBER (prime-product algorithm, arXiv:2407.13208 Section 7)
 # ============================================================
 
 PRIMES = [2, 3, 5, 7, 11, 13, 17, 19]
@@ -343,7 +344,7 @@ nonzero_brute = sum(v for k,v in dist_brute.items() if k > 0)
 # ============================================================
 
 print("\n" + "="*70)
-print("RESULT 1: BRUTE-FORCE DISTRIBUTION (ground truth)")
+print("RESULT 1: BRUTE-FORCE DISTRIBUTION (prime-product method)")
 print("="*70)
 print(f"Total non-zero: {nonzero_brute}")
 for sn in sorted(dist_brute):
@@ -362,7 +363,7 @@ for sn in sorted(dist_graph):
 paper = {2: 93000, 4: 15987, 6: 2664, 8: 19860, 10: 792, 12: 1296, 16: 81}
 
 print("\n" + "="*70)
-print("RESULT 3: COMPARISON WITH TABLE 1 IN PAPER")
+print("RESULT 3: COMPARISON WITH TABLE 2 (SolnDist) OF THE PAPER")
 print("="*70)
 print(f"{'Sol#':>5} {'Paper':>8} {'BruteF':>8} {'Graph':>8} {'Paper=BF':>9} {'Paper=Gr':>9}")
 print(f"{'-'*5} {'-'*8} {'-'*8} {'-'*8} {'-'*9} {'-'*9}")
@@ -382,7 +383,7 @@ print("="*70)
 print(f"Total mismatches: {len(mismatches)}")
 if mismatches:
     print("\nThe two methods disagree on the collections below. Each such collection is")
-    print("a counterexample to at least one of the paper's formulas.\n")
+    print("inconsistent with at least one of the paper's formulas.\n")
     for combo, sg, sb, nc, cd, nt, kt in mismatches[:5]:
         ed = sorted([ne for _, ne, _ in cd])
         print(f"  {combo}")
@@ -391,11 +392,11 @@ if mismatches:
     if len(mismatches) > 5:
         print(f"  ... and {len(mismatches) - 5} more.")
 
-# The headline claim of the paper's verification section. Gated AFTER the diagnostic
-# block above, so a failing run shows its counterexamples before it exits non-zero.
+# The main statement of the paper's verification section. Checked after the
+# diagnostic block above, so a failing run lists the disagreements before it exits.
 check(len(mismatches) == 0,
       f"the graph formulas and the prime-product brute force disagree on {len(mismatches)} "
-      f"collection(s); the paper claims they agree on all {total}")
+      f"collection(s); the paper states that they agree on all {total}")
 
 print("\n" + "="*70)
 print("RESULT 5: THE ZERO-EDGE TREE CASES (k = 0)")
@@ -409,28 +410,26 @@ print("Paper's Lemma wTarget3components: solution number = 4(k+1), so 4 when k=0
 print(f"Collections found: {len(cases_3comp_k0)}")
 check(len(cases_3comp_k0) == 1728,
       f"expected 1,728 three-component k=0 collections, found {len(cases_3comp_k0)}")
-if True:
-    sols_3 = set(s for _, s, _ in cases_3comp_k0)
-    print(f"Prime-product brute force gives: {sols_3}")
-    ok3 = (sols_3 == {4})
-    print(f"Agrees with 4(0+1) = 4 on every collection? {ok3}")
-    check(ok3, f"Lemma wTarget3components fails at k=0: brute force gives {sols_3}, expected 4")
-    print(f"Example: {cases_3comp_k0[0][0]}")
-    print(f"  Components (vertices, edges, is_tree): {cases_3comp_k0[0][2]}")
+sols_3 = set(s for _, s, _ in cases_3comp_k0)
+print(f"Prime-product brute force gives: {sols_3}")
+ok3 = (sols_3 == {4})
+print(f"Agrees with 4(0+1) = 4 on every collection? {ok3}")
+check(ok3, f"Lemma wTarget3components does not hold at k=0: brute force gives {sols_3}, expected 4")
+print(f"Example: {cases_3comp_k0[0][0]}")
+print(f"  Components (vertices, edges, is_tree): {cases_3comp_k0[0][2]}")
 
 print("\n--- Four components, tree with k=1, distribution (1,2,2,2) ---")
 print("Paper's Lemma wTfourcomponents: solution number = 8(k+1), so 16 when k=1.")
 print(f"Collections found: {len(cases_4comp_1222)}")
 check(len(cases_4comp_1222) == 8,
       f"expected 8 collections of distribution (1,2,2,2), found {len(cases_4comp_1222)}")
-if True:
-    sols_1222 = set(s for _, s, _ in cases_4comp_1222)
-    print(f"Prime-product brute force gives: {sols_1222}")
-    ok1222 = (sols_1222 == {16})
-    print(f"Agrees with 8(1+1) = 16 on every collection? {ok1222}")
-    check(ok1222, f"Lemma wTfourcomponents fails at k=1: brute force gives {sols_1222}, expected 16")
-    print(f"Example: {cases_4comp_1222[0][0]}")
-    print(f"  Components (vertices, edges, is_tree): {cases_4comp_1222[0][2]}")
+sols_1222 = set(s for _, s, _ in cases_4comp_1222)
+print(f"Prime-product brute force gives: {sols_1222}")
+ok1222 = (sols_1222 == {16})
+print(f"Agrees with 8(1+1) = 16 on every collection? {ok1222}")
+check(ok1222, f"Lemma wTfourcomponents does not hold at k=1: brute force gives {sols_1222}, expected 16")
+print(f"Example: {cases_4comp_1222[0][0]}")
+print(f"  Components (vertices, edges, is_tree): {cases_4comp_1222[0][2]}")
 
 print("\n--- Four components, tree with k=0, distribution (0,2,2,3) ---")
 print("Paper's Lemma wTfourcomponents: solution number = 8(k+1), so 8 when k=0.")
@@ -439,14 +438,13 @@ print("3-edge unicyclic component each contribute a factor of 2, giving 1*2*2*2 
 print(f"Collections found: {len(cases_4comp_0223)}")
 check(len(cases_4comp_0223) == 24,
       f"expected 24 collections of distribution (0,2,2,3), found {len(cases_4comp_0223)}")
-if True:
-    sols_0223 = set(s for _, s, _ in cases_4comp_0223)
-    print(f"Prime-product brute force gives: {sols_0223}")
-    ok0223 = (sols_0223 == {8})
-    print(f"Agrees with 8(0+1) = 8 on every collection? {ok0223}")
-    check(ok0223, f"Lemma wTfourcomponents fails at k=0: brute force gives {sols_0223}, expected 8")
-    print(f"Example: {cases_4comp_0223[0][0]}")
-    print(f"  Components (vertices, edges, is_tree): {cases_4comp_0223[0][2]}")
+sols_0223 = set(s for _, s, _ in cases_4comp_0223)
+print(f"Prime-product brute force gives: {sols_0223}")
+ok0223 = (sols_0223 == {8})
+print(f"Agrees with 8(0+1) = 8 on every collection? {ok0223}")
+check(ok0223, f"Lemma wTfourcomponents does not hold at k=0: brute force gives {sols_0223}, expected 8")
+print(f"Example: {cases_4comp_0223[0][0]}")
+print(f"  Components (vertices, edges, is_tree): {cases_4comp_0223[0][2]}")
 
 print(f"\n--- ALL 4-component Ba-included collections ---")
 print(f"Total: {len(all_4comp_ba)}")
@@ -458,12 +456,12 @@ for ed in sorted(edge_dist_summary):
     for (sol, nt), count in sorted(edge_dist_summary[ed].items()):
         print(f"    sol={sol}, trees={nt}: {count} collections")
 
-# Post-correction consistency check
+# Consistency check: Table 2 of the paper equals the brute-force distribution.
 print()
 print("CONSISTENCY CHECK:")
 match_direct = all(paper.get(sn,0) == dist_brute.get(sn,0) for sn in all_sns)
-print(f"  Paper distribution table == brute force? {match_direct}")
-check(match_direct, "Paper distribution table (SolnDist) does NOT match brute force. Did it drift?")
+print(f"  Table 2 of the paper == brute-force distribution? {match_direct}")
+check(match_direct, "Table 2 of the paper (SolnDist) does not match the brute-force distribution")
 
 # ============================================================
 # 7. INDEPENDENT CHECKS (method C)
@@ -647,7 +645,7 @@ print("    three cubes), and these are exactly the 72 found: PASS.")
 p_build = Fraction(sum(paper.values()), comb(30, 8))
 check(sum(paper.values()) == 133680 and comb(30, 8) == 5852925,
       "the corollary uses 133,680 solvable collections out of C(30,8) = 5,852,925")
-check(f"{float(p_build):.4f}" == "0.0228", f"p = {float(p_build)} does not round to 0.0228")
+check(round(p_build, 4) == Fraction(228, 10000), f"p = {p_build} does not round to 0.0228")
 print(f"C4. p = 133680/5852925 = {p_build} = {float(p_build):.6f}, about 0.0228: PASS.")
 
 print("\n" + "="*70)
@@ -660,7 +658,7 @@ print(f"""
    {n_parallel_pairs} pairs of parallel edges, bipartite={is_bip},
    every vertex of degree {min(degree.values())}. Asserted above.
 
-2. Distribution table of the paper (label SolnDist): reproduced on all {len(paper)} solution numbers?
+2. Table 2 of the paper (label SolnDist): reproduced on all {len(paper)} solution numbers?
    {_table_ok}. Total solvable collections = {nonzero_brute:,}.
 
 3. Lemma wTfourcomponents, solution number 8(k+1):
@@ -670,8 +668,8 @@ print(f"""
 4. Lemma wTarget3components, solution number 4(k+1):
    - k=0, distribution (0,a,7-a), a in {{2,3}}: {len(cases_3comp_k0):,} collections, all sol=4.
 
-5. CROSS-VALIDATION: graph-theoretic formulas vs the prime-product brute force of
-   arXiv:2407.13208, over all {total:,} usable-for-Ba collections.
+5. CROSS-VALIDATION: graph-theoretic formulas vs the prime-product algorithm of
+   arXiv:2407.13208 (Section 7), over all {total:,} usable-for-Ba collections.
    Mismatches: {len(mismatches)}.
 
 6. INDEPENDENT CHECKS (method C), all asserted above:

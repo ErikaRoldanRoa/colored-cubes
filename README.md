@@ -80,8 +80,7 @@ python3 verify_graph_M.py
 ```
 
 Standard library only (no NumPy, no NetworkX), no network access, no randomness. Tested with
-Python 3.9.6 and 3.11.5; it runs in about 35 seconds on a laptop, of which method C takes
-under 10.
+Python 3.9.6 and 3.11.5; it runs in about 35 seconds on a laptop.
 
 Every check is a hard gate: a failure aborts the run with `VERIFICATION FAILED: …` and a non-zero
 exit status, and is a genuine disagreement with the paper worth reporting. (The gates are ordinary

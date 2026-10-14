@@ -51,7 +51,7 @@ C(21,8) = 203490 (only usable cubes for Ba)
   Processed 200000...
 
 ======================================================================
-RESULT 1: BRUTE-FORCE DISTRIBUTION (ground truth)
+RESULT 1: BRUTE-FORCE DISTRIBUTION (prime-product method)
 ======================================================================
 Total non-zero: 133680
   Solution number   2:  93000
@@ -75,7 +75,7 @@ Total non-zero: 133680
   Solution number  16:     81
 
 ======================================================================
-RESULT 3: COMPARISON WITH TABLE 1 IN PAPER
+RESULT 3: COMPARISON WITH TABLE 2 (SolnDist) OF THE PAPER
 ======================================================================
  Sol#    Paper   BruteF    Graph  Paper=BF  Paper=Gr
 ----- -------- -------- -------- --------- ---------
@@ -134,7 +134,7 @@ Total: 32
     sol=16, trees=1: 8 collections
 
 CONSISTENCY CHECK:
-  Paper distribution table == brute force? True
+  Table 2 of the paper == brute-force distribution? True
 
 ======================================================================
 INDEPENDENT CHECKS (method C: from the face colourings, all 30 targets)
@@ -159,7 +159,7 @@ FINAL SUMMARY
    4 pairs of parallel edges, bipartite=True,
    every vertex of degree 5. Asserted above.
 
-2. Distribution table of the paper (label SolnDist): reproduced on all 7 solution numbers?
+2. Table 2 of the paper (label SolnDist): reproduced on all 7 solution numbers?
    True. Total solvable collections = 133,680.
 
 3. Lemma wTfourcomponents, solution number 8(k+1):
@@ -169,8 +169,8 @@ FINAL SUMMARY
 4. Lemma wTarget3components, solution number 4(k+1):
    - k=0, distribution (0,a,7-a), a in {2,3}: 1,728 collections, all sol=4.
 
-5. CROSS-VALIDATION: graph-theoretic formulas vs the prime-product brute force of
-   arXiv:2407.13208, over all 203,490 usable-for-Ba collections.
+5. CROSS-VALIDATION: graph-theoretic formulas vs the prime-product algorithm of
+   arXiv:2407.13208 (Section 7), over all 203,490 usable-for-Ba collections.
    Mismatches: 0.
 
 6. INDEPENDENT CHECKS (method C), all asserted above:

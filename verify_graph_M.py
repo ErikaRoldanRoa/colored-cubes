@@ -194,10 +194,45 @@ check(_n_unusable == 9, f"exactly 9 cubes must be unusable for Ba, got {_n_unusa
 check(len(ALL_CUBES) == 30, f"there must be 30 MacMahon cubes, got {len(ALL_CUBES)}")
 check(_n_unusable + len(edges) + 1 == 30, "unusable + usable + target must account for all 30 cubes")
 
+# The Conway names, checked against the structure of Conway's tableau (from the table
+# alone). Cube Xy sits in row X and column y of the tableau, and its mirror cube is Yx.
+# For every cube Xy: the cubes sharing no corner number with it are exactly the other
+# cubes of row X and of column y, and Yx; the corner numbers of Yx are those of Xy read
+# the other way round (abc -> acb). Each row and each column holds all 40 corner numbers.
+# This catches a name attached to the wrong cube; it cannot tell the letters A to F apart
+# beyond this structure.
+_LETTERS = "ABCDEF"
+check(set(ALL_CUBES) == {X + y.lower() for X, y in permutations(_LETTERS, 2)},
+      f"the cubes must be named Xy for distinct letters X, y in A..F, got {sorted(ALL_CUBES)}")
+_name_errors = []
+for _t, _cs in sorted(ALL_CUBES.items()):
+    _X, _y = _t[0], _t[1]
+    _mirror = _y.upper() + _X.lower()
+    _disjoint = {n for n, c in ALL_CUBES.items() if n != _t and not set(c) & set(_cs)}
+    _expected = {n for n in ALL_CUBES if n != _t and (n[0] == _X or n[1] == _y)} | {_mirror}
+    if _disjoint != _expected:
+        _name_errors.append(f"{_t}: cubes sharing no corner number {sorted(_disjoint)}, "
+                            f"expected row, column and mirror {sorted(_expected)}")
+    if set(ALL_CUBES[_mirror]) != {c[0] + c[2] + c[1] for c in _cs}:
+        _name_errors.append(f"{_t}: {_mirror} is not its mirror cube")
+for _L in _LETTERS:
+    for _what, _line in (("row", [n for n in ALL_CUBES if n[0] == _L]),
+                         ("column", [n for n in ALL_CUBES if n[1] == _L.lower()])):
+        _c = [c for n in _line for c in ALL_CUBES[n]]
+        if not (len(_line) == 5 and len(set(_c)) == len(_c) == 40):
+            _name_errors.append(f"{_what} {_L} does not hold the 40 corner numbers once each")
+check(not _name_errors,
+      f"the Conway names do not fit the tableau ({len(_name_errors)} problem(s)), "
+      f"first: {_name_errors[:1]}")
+
 print("\nStructural assertions on M: PASS "
       "(8 vertices, 20 edges, 4 parallel pairs, bipartite, 5-regular).")
 print("Cube-data assertions: PASS "
       "(30 cubes; usable corner count 8 for Ba, 0 or 2 for the rest; 9 unusable, 20 usable).")
+print("Conway-name assertions: PASS (for each cube Xy, the cubes sharing no corner number")
+print("  with it are the rest of row X and column y and its mirror cube Yx, whose corner")
+print("  numbers are those of Xy read the other way round; each row and each column of")
+print("  the tableau holds all 40 corner numbers).")
 
 # ============================================================
 # 3. GRAPH-BASED SOLUTION NUMBER (paper's formula)
@@ -542,8 +577,10 @@ table_sets = {frozenset(c) for c in ALL_CUBES.values()}
 check(len(set(rebuilt_sets)) == 30 and set(rebuilt_sets) == table_sets,
       "the 30 cubes rebuilt from the colorings differ from the 30 cubes of the table")
 print("C1. 720 colorings / 24 rotations = 30 cubes; their corner-number sets equal the")
-print("    30 cubes of the table: PASS. (This checks the cubes as sets of corner numbers;")
-print("    it does not check which Conway name the table gives to each cube.)")
+print("    30 cubes of the table: PASS. (This checks the cubes as sets of corner numbers,")
+print("    not the direction in which corner numbers are read: the other direction gives")
+print("    the mirror cubes, also among the 30. The Conway names are checked only against")
+print("    the row, column and mirror structure of the tableau, above.)")
 
 # --- C2. Every target, solved by placing colored cubes -----------------------
 # In the 2x2x2 block, the small cube at corner s shows its faces in the directions
@@ -679,7 +716,9 @@ print(f"""
 
 6. METHOD C AND FURTHER COUNTS, all asserted above:
    - the 30 cubes rebuilt from the 720 colorings equal the table's 30 cubes
-     as sets of corner numbers (the Conway names are not checked);
+     as sets of corner numbers (the Conway names are checked only against the
+     tableau's rows, columns and mirror cubes, and the reading direction of
+     corner numbers is not checked);
    - all 30 targets give the distribution of Table 2, and for each, 1 of its
      81 collections with solution number 16 avoids the target and 80 contain it;
    - for Ba: 81 = 1 + 8 + {len(sol16_n3)}, with {len(sol16_n3)} = 6 x 12;

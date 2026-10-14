@@ -44,13 +44,14 @@ usable for $\mathrm{Ba}$: the 20 above together with $\mathrm{Ba}$ itself. ($\bi
 |---|---|
 | $M$ has 8 vertices, 20 edges, four pairs of parallel edges, is bipartite, and is 5-regular | Built from the table of corner numbers; **checked**, so a failure stops the run. ($M$ is loopless by construction: an edge joins the two *distinct* corner numbers a cube shares with the target.) |
 | The cube data: the target shares all 8 of its corner numbers with itself, every other cube shares exactly 0 or 2, and exactly 9 of the 30 cubes are unusable for the target | Computed from the table; **checked** |
+| The Conway names fit the tableau: for each cube $\mathrm{Xy}$, the cubes sharing no corner number with it are the rest of row $\mathrm{X}$ and column $\mathrm{y}$ and its mirror cube $\mathrm{Yx}$, whose corner numbers are those of $\mathrm{Xy}$ read the other way round; each row and each column holds all 40 corner numbers | Computed from the table; **checked**. This catches a name attached to the wrong cube; it checks the names against this structure only. |
 | The distribution of solution numbers over the $133{,}680$ solvable collections (Table 2 of the paper) | Full enumeration by the prime-product method, compared entry by entry; **checked** |
 | The theorem for target-free collections: solution number $= 2^{n}$ | Graph component/tree analysis vs. brute force on every collection; agreement is **checked** |
 | The theorem for target-containing collections: $8$, $2(k{+}1)$, $4(k{+}1)$, $8(k{+}1)$ for $n = 1,2,3,4$ | Graph component/tree analysis vs. brute force on every collection; agreement is **checked** |
 | The three-component lemma at $k = 0$: exactly $1{,}728$ collections, all with solution number $4$ | Filtered from the enumeration; both the count and the value are **checked** |
 | The four-component lemma at $k = 0$: exactly $24$ collections, all with solution number $8$ | Filtered from the enumeration; both the count and the value are **checked** |
 | The 81 collections with solution number $16$: $1$ avoids $\mathrm{Ba}$ (the four diagonal pairs) and $80$ contain it, $80 = 8 + 72$, and $72 = 6 \times 12$ (two diagonal pairs, then a path of three cubes spanning the other four corner numbers) | Filtered from the enumeration, and the 72 rebuilt from $M$ as in the paper; **checked** |
-| **Method C.** The 30 MacMahon cubes: rebuilt from all $6! = 720$ colorings with six distinct colors, up to the 24 rotations, they are exactly the 30 cubes of the table | Compared as sets of corner numbers; **checked**. This does not check which Conway name the table gives to each cube (nor the reading direction of corner numbers: reading them the other way turns each cube into its mirror cube, also one of the 30). |
+| **Method C.** The 30 MacMahon cubes: rebuilt from all $6! = 720$ colorings with six distinct colors, up to the 24 rotations, they are exactly the 30 cubes of the table | Compared as sets of corner numbers; **checked**. This does not check the reading direction of corner numbers (reading them the other way turns each cube into its mirror cube, also one of the 30); the Conway names are checked only by the row above. |
 | **Method C.** The same distribution (Table 2) for every one of the 30 targets, with 1 of the 81 maximal collections avoiding the target and 80 containing it | Every target solved by placing the colored cubes in the corners of the $2\times2\times2$ block; **checked** |
 | The corollary: $p = 133{,}680 / 5{,}852{,}925 \approx 0.0228$ | Exact fraction; **checked** |
 
@@ -111,6 +112,7 @@ Each command runs the full verification and prints the lines that state one clai
 |---|---|
 | Structure of $M$ | `python3 verify_graph_M.py \| grep 'Structural assertions'` |
 | Cube data (0 or 2 shared corners, 9 unusable) | `python3 verify_graph_M.py \| grep 'Cube-data assertions'` |
+| The Conway names fit the tableau | `python3 verify_graph_M.py \| grep -A3 'Conway-name assertions'` |
 | Table 2 | `python3 verify_graph_M.py \| sed -n '/^RESULT 3/,/^Total/p'` |
 | Both theorems, on every collection | `python3 verify_graph_M.py \| grep 'Total mismatches'` |
 | The $1{,}728$ and $24$ collections with $k = 0$ | `python3 verify_graph_M.py \| grep -A5 'tree with k=0'` |

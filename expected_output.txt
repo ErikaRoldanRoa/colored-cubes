@@ -39,6 +39,10 @@ Multi-edges (pairs sharing same two corners):
 
 Structural assertions on M: PASS (8 vertices, 20 edges, 4 parallel pairs, bipartite, 5-regular).
 Cube-data assertions: PASS (30 cubes; usable corner count 8 for Ba, 0 or 2 for the rest; 9 unusable, 20 usable).
+Conway-name assertions: PASS (for each cube Xy, the cubes sharing no corner number
+  with it are the rest of row X and column y and its mirror cube Yx, whose corner
+  numbers are those of Xy read the other way round; each row and each column of
+  the tableau holds all 40 corner numbers).
 
 ======================================================================
 ENUMERATING ALL COLLECTIONS
@@ -140,8 +144,10 @@ CONSISTENCY CHECK:
 METHOD C (C1, C2: from the face colorings) AND FURTHER COUNTS (C3, C4)
 ======================================================================
 C1. 720 colorings / 24 rotations = 30 cubes; their corner-number sets equal the
-    30 cubes of the table: PASS. (This checks the cubes as sets of corner numbers;
-    it does not check which Conway name the table gives to each cube.)
+    30 cubes of the table: PASS. (This checks the cubes as sets of corner numbers,
+    not the direction in which corner numbers are read: the other direction gives
+    the mirror cubes, also among the 30. The Conway names are checked only against
+    the row, column and mirror structure of the tableau, above.)
 C2. For each of the 30 targets: 21 usable cubes, and the distribution of solution
     numbers equals Table 2; of its 81 collections with solution number 16, 1 avoids
     the target and 80 contain it: PASS (all 30 targets).
@@ -175,7 +181,9 @@ FINAL SUMMARY
 
 6. METHOD C AND FURTHER COUNTS, all asserted above:
    - the 30 cubes rebuilt from the 720 colorings equal the table's 30 cubes
-     as sets of corner numbers (the Conway names are not checked);
+     as sets of corner numbers (the Conway names are checked only against the
+     tableau's rows, columns and mirror cubes, and the reading direction of
+     corner numbers is not checked);
    - all 30 targets give the distribution of Table 2, and for each, 1 of its
      81 collections with solution number 16 avoids the target and 80 contain it;
    - for Ba: 81 = 1 + 8 + 72, with 72 = 6 x 12;

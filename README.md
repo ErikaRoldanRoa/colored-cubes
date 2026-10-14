@@ -83,11 +83,12 @@ python3 verify_graph_M.py
 ```
 
 Standard library only (no NumPy, no NetworkX), no network access, no randomness. Tested with
-Python 3.9.6 and 3.11.5; it runs in about 35 seconds on a laptop.
+Python 3.9.6 and 3.11.5; it runs in about half a minute on a laptop.
 
 Every check is a hard gate: a failure aborts the run with `VERIFICATION FAILED: …` and a non-zero
-exit status, and is a genuine disagreement with the paper worth reporting. (The gates are ordinary
-conditionals, not `assert`, so they are not removed by `python3 -O`.)
+exit status. A failure on an unmodified copy means the script and the paper disagree somewhere;
+please report it (see below). (The gates are ordinary conditionals, not `assert`, so they are not
+removed by `python3 -O`.)
 
 The printed output is the same, byte for byte, on every run, under Python 3.9 and 3.11 and
 whatever the hash seed; `expected_output.txt` is a committed copy of it:
@@ -106,7 +107,8 @@ python3 verify_graph_M.py --out /tmp/run.csv && cmp /tmp/run.csv solution_number
 
 ### One command per claim
 
-Each command runs the full verification and prints the lines that state one claim.
+Each command runs the full verification and prints the lines that state one claim. To check them
+all at once, run `python3 verify_graph_M.py > run.txt` once and apply each filter to `run.txt`.
 
 | Claim | Command |
 |---|---|

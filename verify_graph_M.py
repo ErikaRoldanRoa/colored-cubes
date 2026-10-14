@@ -35,7 +35,7 @@ It reports:
 
 No randomness, no network access, and no dependencies outside the Python
 standard library; every count is exact integer arithmetic, and the printed
-output is the same on every run. Runtime is about 35 s.
+output is the same on every run. Runtime is about half a minute.
 
 Usage:  python3 verify_graph_M.py [--out PATH]
 """

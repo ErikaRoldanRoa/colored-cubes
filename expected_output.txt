@@ -79,7 +79,7 @@ Total non-zero: 133680
   Solution number  16:     81
 
 ======================================================================
-RESULT 3: COMPARISON WITH TABLE 2 (SolnDist) OF THE PAPER
+RESULT 3: COMPARISON WITH TABLE 2 OF THE PAPER (label SolnDist)
 ======================================================================
  Sol#    Paper   BruteF    Graph  Paper=BF  Paper=Gr
 ----- -------- -------- -------- --------- ---------
@@ -105,15 +105,18 @@ Ba itself. These cases contribute the factor k+1 = 1 and are the easiest to
 overlook, so they are checked here explicitly against the paper's lemmas.
 
 --- Three components, tree with k=0 ---
-Paper's Lemma wTarget3components: solution number = 4(k+1), so 4 when k=0.
+Paper's three-component lemma (label wTarget3components):
+solution number = 4(k+1), so 4 when k=0.
 Collections found: 1728
+Edge distributions: (0, 2, 5): 1104, (0, 3, 4): 624
 Prime-product brute force gives: {4}
 Agrees with 4(0+1) = 4 on every collection? True
 Example: ('Ac', 'Ad', 'Ae', 'Cb', 'Cd', 'Cf', 'Db', 'Ba')
   Components (vertices, edges, is_tree): [(5, 5, False), (2, 2, False), (1, 0, True)]
 
 --- Four components, tree with k=1, distribution (1,2,2,2) ---
-Paper's Lemma wTfourcomponents: solution number = 8(k+1), so 16 when k=1.
+Paper's four-component lemma (label wTfourcomponents):
+solution number = 8(k+1), so 16 when k=1.
 Collections found: 8
 Prime-product brute force gives: {16}
 Agrees with 8(1+1) = 16 on every collection? True
@@ -121,7 +124,8 @@ Example: ('Ac', 'Ad', 'Ae', 'Af', 'Cb', 'Db', 'Eb', 'Ba')
   Components (vertices, edges, is_tree): [(2, 2, False), (2, 2, False), (2, 1, True), (2, 2, False)]
 
 --- Four components, tree with k=0, distribution (0,2,2,3) ---
-Paper's Lemma wTfourcomponents: solution number = 8(k+1), so 8 when k=0.
+Paper's four-component lemma (label wTfourcomponents):
+solution number = 8(k+1), so 8 when k=0.
 Structure: Ba sits on the isolated vertex (1 way); two 2-cycles and one
 3-edge unicyclic component each contribute a factor of 2, giving 1*2*2*2 = 8.
 Collections found: 24
@@ -141,7 +145,7 @@ CONSISTENCY CHECK:
   Table 2 of the paper == brute-force distribution? True
 
 ======================================================================
-METHOD C (C1, C2: from the face colorings) AND FURTHER COUNTS (C3, C4)
+METHOD C (C1, C2: from the face colorings) AND FURTHER COUNTS FOR Ba (D1, D2)
 ======================================================================
 C1. 720 colorings / 24 rotations = 30 cubes; their corner-number sets equal the
     30 cubes of the table: PASS. (This checks the cubes as sets of corner numbers,
@@ -153,11 +157,11 @@ C2. For each of the 30 targets: 21 usable cubes, and the distribution of solutio
     the distribution methods A and B give over the collections containing Ba; of
     its 81 collections with solution number 16, 1 avoids the target and 80 contain
     it: PASS (all 30 targets).
-C3. Target Ba: 81 collections with solution number 16 = 1 without Ba (the four
-    diagonal pairs Ac, Ad, Ae, Af, Cb, Db, Eb, Fb) + 8 with four components + 72 with
+D1. Target Ba: 81 collections with solution number 16 = 1 without Ba (the four
+    diagonal pairs Ac/Cb, Ad/Db, Ae/Eb, Af/Fb) + 8 with four components + 72 with
     three components; 72 = 6 x 12 (two diagonal pairs, then a spanning path of
     three cubes), and these are exactly the 72 found: PASS.
-C4. p = 133680/5852925 = 8912/390195 = 0.022840, about 0.0228: PASS.
+D2. p = 133680/5852925 = 8912/390195 = 0.022840, about 0.0228: PASS.
 
 ======================================================================
 FINAL SUMMARY
@@ -170,24 +174,28 @@ FINAL SUMMARY
 2. Table 2 of the paper (label SolnDist): reproduced on all 7 solution numbers?
    True. Total solvable collections = 133,680.
 
-3. Lemma wTfourcomponents, solution number 8(k+1):
+3. The four-component lemma (label wTfourcomponents), solution number 8(k+1):
    - k=0, distribution (0,2,2,3): 24 collections, all sol=8.
    - k=1, distribution (1,2,2,2): 8 collections, all sol=16.
 
-4. Lemma wTarget3components, solution number 4(k+1):
+4. The three-component lemma (label wTarget3components), solution number 4(k+1):
    - k=0, distribution (0,a,7-a), a in {2,3}: 1,728 collections, all sol=4.
 
 5. CROSS-VALIDATION: graph-theoretic formulas vs the prime-product algorithm of
    arXiv:2407.13208 (Section 7), over all 203,490 usable-for-Ba collections.
    Mismatches: 0.
 
-6. METHOD C AND FURTHER COUNTS, all asserted above:
-   - the 30 cubes rebuilt from the 720 colorings equal the table's 30 cubes
+6. METHOD C, asserted above:
+   - C1: the 30 cubes rebuilt from the 720 colorings equal the table's 30 cubes
      as sets of corner numbers (the Conway names are checked only against the
      tableau's rows, columns and mirror cubes, and the reading direction of
      corner numbers is not checked);
-   - all 30 targets give the distribution of Table 2, and for each, 1 of its
-     81 collections with solution number 16 avoids the target and 80 contain it;
-   - for Ba: 81 = 1 + 8 + 72, with 72 = 6 x 12;
-   - p = 133680/5852925 = 0.0228.
+   - C2: all 30 targets give the distribution of Table 2, also over the
+     collections containing the target (as methods A and B give for Ba), and
+     for each, 1 of its 81 collections with solution number 16 avoids the
+     target and 80 contain it (the 1 + 80 split).
+
+7. FURTHER COUNTS FOR Ba, asserted above:
+   - D1: 81 = 1 + 8 + 72, with 72 = 6 x 12;
+   - D2: p = 133680/5852925 = 0.0228.
 

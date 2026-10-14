@@ -29,8 +29,9 @@ It reports:
      with methods A and B for Ba) and the 1 + 80 split of the 81 collections with
      solution number 16, computed by placing colored cubes in the corners of the
      2x2x2 block;
-  6. for Ba, the 81 collections with solution number 16 (1 + 8 + 72, with
-     72 = 6 x 12), and the corollary's p = 133680/5852925.
+  6. further counts for Ba, which use the table and M and are not part of
+     method C (D1, D2 in the output): the 81 collections with solution number 16
+     (1 + 8 + 72, with 72 = 6 x 12), and the corollary's p = 133680/5852925.
 
 No randomness, no network access, and no dependencies outside the Python
 standard library; every count is exact integer arithmetic, and the printed
@@ -402,7 +403,7 @@ for sn in sorted(dist_graph):
 paper = {2: 93000, 4: 15987, 6: 2664, 8: 19860, 10: 792, 12: 1296, 16: 81}
 
 print("\n" + "="*70)
-print("RESULT 3: COMPARISON WITH TABLE 2 (SolnDist) OF THE PAPER")
+print("RESULT 3: COMPARISON WITH TABLE 2 OF THE PAPER (label SolnDist)")
 print("="*70)
 print(f"{'Sol#':>5} {'Paper':>8} {'BruteF':>8} {'Graph':>8} {'Paper=BF':>9} {'Paper=Gr':>9}")
 print(f"{'-'*5} {'-'*8} {'-'*8} {'-'*8} {'-'*9} {'-'*9}")
@@ -445,20 +446,28 @@ print("Ba itself. These cases contribute the factor k+1 = 1 and are the easiest 
 print("overlook, so they are checked here explicitly against the paper's lemmas.")
 
 print("\n--- Three components, tree with k=0 ---")
-print("Paper's Lemma wTarget3components: solution number = 4(k+1), so 4 when k=0.")
+print("Paper's three-component lemma (label wTarget3components):")
+print("solution number = 4(k+1), so 4 when k=0.")
 print(f"Collections found: {len(cases_3comp_k0)}")
 check(len(cases_3comp_k0) == 1728,
       f"expected 1,728 three-component k=0 collections, found {len(cases_3comp_k0)}")
 sols_3 = set(s for _, s, _ in cases_3comp_k0)
+_dists_3 = defaultdict(int)
+for _, _, _cd in cases_3comp_k0:
+    _dists_3[tuple(sorted(ne for _, ne, _ in _cd))] += 1
+check(set(_dists_3) <= {(0, 2, 5), (0, 3, 4)},
+      f"expected edge distributions (0,2,5) and (0,3,4) only, got {dict(_dists_3)}")
+print("Edge distributions: " + ", ".join(f"{d}: {n}" for d, n in sorted(_dists_3.items())))
 print(f"Prime-product brute force gives: {sols_3}")
 ok3 = (sols_3 == {4})
 print(f"Agrees with 4(0+1) = 4 on every collection? {ok3}")
-check(ok3, f"Lemma wTarget3components does not hold at k=0: brute force gives {sols_3}, expected 4")
+check(ok3, f"the three-component lemma does not hold at k=0: brute force gives {sols_3}, expected 4")
 print(f"Example: {cases_3comp_k0[0][0]}")
 print(f"  Components (vertices, edges, is_tree): {cases_3comp_k0[0][2]}")
 
 print("\n--- Four components, tree with k=1, distribution (1,2,2,2) ---")
-print("Paper's Lemma wTfourcomponents: solution number = 8(k+1), so 16 when k=1.")
+print("Paper's four-component lemma (label wTfourcomponents):")
+print("solution number = 8(k+1), so 16 when k=1.")
 print(f"Collections found: {len(cases_4comp_1222)}")
 check(len(cases_4comp_1222) == 8,
       f"expected 8 collections of distribution (1,2,2,2), found {len(cases_4comp_1222)}")
@@ -466,12 +475,13 @@ sols_1222 = set(s for _, s, _ in cases_4comp_1222)
 print(f"Prime-product brute force gives: {sols_1222}")
 ok1222 = (sols_1222 == {16})
 print(f"Agrees with 8(1+1) = 16 on every collection? {ok1222}")
-check(ok1222, f"Lemma wTfourcomponents does not hold at k=1: brute force gives {sols_1222}, expected 16")
+check(ok1222, f"the four-component lemma does not hold at k=1: brute force gives {sols_1222}, expected 16")
 print(f"Example: {cases_4comp_1222[0][0]}")
 print(f"  Components (vertices, edges, is_tree): {cases_4comp_1222[0][2]}")
 
 print("\n--- Four components, tree with k=0, distribution (0,2,2,3) ---")
-print("Paper's Lemma wTfourcomponents: solution number = 8(k+1), so 8 when k=0.")
+print("Paper's four-component lemma (label wTfourcomponents):")
+print("solution number = 8(k+1), so 8 when k=0.")
 print("Structure: Ba sits on the isolated vertex (1 way); two 2-cycles and one")
 print("3-edge unicyclic component each contribute a factor of 2, giving 1*2*2*2 = 8.")
 print(f"Collections found: {len(cases_4comp_0223)}")
@@ -481,7 +491,7 @@ sols_0223 = set(s for _, s, _ in cases_4comp_0223)
 print(f"Prime-product brute force gives: {sols_0223}")
 ok0223 = (sols_0223 == {8})
 print(f"Agrees with 8(0+1) = 8 on every collection? {ok0223}")
-check(ok0223, f"Lemma wTfourcomponents does not hold at k=0: brute force gives {sols_0223}, expected 8")
+check(ok0223, f"the four-component lemma does not hold at k=0: brute force gives {sols_0223}, expected 8")
 print(f"Example: {cases_4comp_0223[0][0]}")
 print(f"  Components (vertices, edges, is_tree): {cases_4comp_0223[0][2]}")
 
@@ -500,20 +510,20 @@ print()
 print("CONSISTENCY CHECK:")
 match_direct = all(paper.get(sn,0) == dist_brute.get(sn,0) for sn in all_sns)
 print(f"  Table 2 of the paper == brute-force distribution? {match_direct}")
-check(match_direct, "Table 2 of the paper (SolnDist) does not match the brute-force distribution")
+check(match_direct, "Table 2 of the paper (label SolnDist) does not match the brute-force distribution")
 
 # ============================================================
-# 7. METHOD C AND FURTHER COUNTS
+# 7. METHOD C, AND FURTHER COUNTS FOR Ba
 #    C1, C2 (method C): the 30 cubes are rebuilt from their face colorings, and
 #    every target is solved by placing colored cubes in the corners of the
 #    2x2x2 block. Nothing in C1 and C2 reads the corner-number table above,
 #    except to compare with it at the end of C1.
-#    C3, C4: the counts of the 81 collections with solution number 16 and the
-#    corollary.
+#    D1, D2 (not method C; they use the table, M and the enumeration above): the
+#    counts of the 81 collections with solution number 16, and the corollary.
 # ============================================================
 
 print("\n" + "="*70)
-print("METHOD C (C1, C2: from the face colorings) AND FURTHER COUNTS (C3, C4)")
+print("METHOD C (C1, C2: from the face colorings) AND FURTHER COUNTS FOR Ba (D1, D2)")
 print("="*70)
 
 # --- C1. The 30 MacMahon cubes, rebuilt -------------------------------------
@@ -658,7 +668,7 @@ print("    the distribution methods A and B give over the collections containing
 print("    its 81 collections with solution number 16, 1 avoids the target and 80 contain")
 print("    it: PASS (all 30 targets).")
 
-# --- C3. The 81 collections with solution number 16, for the target Ba --------
+# --- D1. The 81 collections with solution number 16, for the target Ba --------
 # (From the enumeration above and the graph M.)
 diagonal_pairs = sorted(sorted(c) for c in edge_to_cubes.values() if len(c) == 2)
 diagonals = sorted(c for pair in diagonal_pairs for c in pair)
@@ -691,17 +701,17 @@ check(len(_paths_per_choice) == 6 and _paths_per_choice == [12] * 6,
 check(_built72 == {tuple(sorted(c)) for c in sol16_n3},
       "the 72 collections built as two diagonal pairs + a spanning path + Ba differ from "
       "the 72 found by the enumeration")
-print("C3. Target Ba: 81 collections with solution number 16 = 1 without Ba (the four")
-print(f"    diagonal pairs {', '.join(diagonals)}) + 8 with four components + 72 with")
+print("D1. Target Ba: 81 collections with solution number 16 = 1 without Ba (the four")
+print(f"    diagonal pairs {', '.join('/'.join(p) for p in diagonal_pairs)}) + 8 with four components + 72 with")
 print("    three components; 72 = 6 x 12 (two diagonal pairs, then a spanning path of")
 print("    three cubes), and these are exactly the 72 found: PASS.")
 
-# --- C4. The corollary ----------------------------------------------------------
+# --- D2. The corollary ----------------------------------------------------------
 p_build = Fraction(sum(paper.values()), comb(30, 8))
 check(sum(paper.values()) == 133680 and comb(30, 8) == 5852925,
       "the corollary uses 133,680 solvable collections out of C(30,8) = 5,852,925")
 check(round(p_build, 4) == Fraction(228, 10000), f"p = {p_build} does not round to 0.0228")
-print(f"C4. p = 133680/5852925 = {p_build} = {float(p_build):.6f}, about 0.0228: PASS.")
+print(f"D2. p = 133680/5852925 = {p_build} = {float(p_build):.6f}, about 0.0228: PASS.")
 
 print("\n" + "="*70)
 print("FINAL SUMMARY")
@@ -716,26 +726,30 @@ print(f"""
 2. Table 2 of the paper (label SolnDist): reproduced on all {len(paper)} solution numbers?
    {_table_ok}. Total solvable collections = {nonzero_brute:,}.
 
-3. Lemma wTfourcomponents, solution number 8(k+1):
+3. The four-component lemma (label wTfourcomponents), solution number 8(k+1):
    - k=0, distribution (0,2,2,3): {len(cases_4comp_0223):,} collections, all sol=8.
    - k=1, distribution (1,2,2,2): {len(cases_4comp_1222):,} collections, all sol=16.
 
-4. Lemma wTarget3components, solution number 4(k+1):
+4. The three-component lemma (label wTarget3components), solution number 4(k+1):
    - k=0, distribution (0,a,7-a), a in {{2,3}}: {len(cases_3comp_k0):,} collections, all sol=4.
 
 5. CROSS-VALIDATION: graph-theoretic formulas vs the prime-product algorithm of
    arXiv:2407.13208 (Section 7), over all {total:,} usable-for-Ba collections.
    Mismatches: {len(mismatches)}.
 
-6. METHOD C AND FURTHER COUNTS, all asserted above:
-   - the 30 cubes rebuilt from the 720 colorings equal the table's 30 cubes
+6. METHOD C, asserted above:
+   - C1: the 30 cubes rebuilt from the 720 colorings equal the table's 30 cubes
      as sets of corner numbers (the Conway names are checked only against the
      tableau's rows, columns and mirror cubes, and the reading direction of
      corner numbers is not checked);
-   - all 30 targets give the distribution of Table 2, and for each, 1 of its
-     81 collections with solution number 16 avoids the target and 80 contain it;
-   - for Ba: 81 = 1 + 8 + {len(sol16_n3)}, with {len(sol16_n3)} = 6 x 12;
-   - p = 133680/5852925 = {float(p_build):.4f}.
+   - C2: all 30 targets give the distribution of Table 2, also over the
+     collections containing the target (as methods A and B give for Ba), and
+     for each, 1 of its 81 collections with solution number 16 avoids the
+     target and 80 contain it (the 1 + 80 split).
+
+7. FURTHER COUNTS FOR Ba, asserted above:
+   - D1: 81 = 1 + 8 + {len(sol16_n3)}, with {len(sol16_n3)} = 6 x 12;
+   - D2: p = 133680/5852925 = {float(p_build):.4f}.
 """)
 
 # ============================================================

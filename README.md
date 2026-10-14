@@ -47,11 +47,13 @@ usable for $\mathrm{Ba}$: the 20 above together with $\mathrm{Ba}$ itself. ($\bi
 | The theorem for target-containing collections: $8$, $2(k{+}1)$, $4(k{+}1)$, $8(k{+}1)$ for $n = 1,2,3,4$ | Graph component/tree analysis vs. brute force on every collection; agreement is **checked** |
 | The three-component lemma at $k = 0$: exactly $1{,}728$ collections, all with solution number $4$ | Filtered from the enumeration; both the count and the value are **checked** |
 | The four-component lemma at $k = 0$: exactly $24$ collections, all with solution number $8$ | Filtered from the enumeration; both the count and the value are **checked** |
+| The 81 collections with solution number $16$: $1$ avoids $\mathrm{Ba}$ (the four diagonal pairs) and $80$ contain it, $80 = 8 + 72$, and $72 = 6 \times 12$ (two diagonal pairs, then a path of three cubes spanning the other four corner numbers) | Filtered from the enumeration, and the 72 rebuilt from $M$ as in the paper; **checked** |
+| **Method C.** The 30 MacMahon cubes: rebuilt from all $6! = 720$ colourings with six distinct colours, up to the 24 rotations, they are exactly the 30 cubes of the table | Compared as sets of corner numbers; **checked**. This does not check which Conway name the table gives to each cube. |
+| **Method C.** The same distribution (Table 2) for every one of the 30 targets, with 1 of the 81 maximal collections avoiding the target and 80 containing it | Every target solved by placing the coloured cubes in the corners of the $2\times2\times2$ block; **checked** |
+| The corollary: $p = 133{,}680 / 5{,}852{,}925 \approx 0.0228$ | Exact fraction; **checked** |
 
 **Scope.** This repository covers the paper above only. It does not cover the companion work on
-universal sets and buildability distributions, nor does it re-derive every incidental number in the
-text (for example the count of spanning paths used in the maximum-solution argument, or the
-probability in the corollary).
+universal sets and buildability distributions.
 
 **Where the cube data comes from.** The table of the 30 cubes in `verify_graph_M.py` (each cube's
 Conway name and its eight corner numbers) is taken from the authors' dataset: `C36.csv` in
@@ -62,7 +64,12 @@ printed as Table 3 of [arXiv:2407.13208](https://arxiv.org/abs/2407.13208).
 applies the paper's graph-theoretic formulas to the component structure of $G_W$. Method B is the
 prime-product algorithm of [arXiv:2407.13208](https://arxiv.org/abs/2407.13208) (Section 7),
 reimplemented here, which counts placements directly and uses none of the paper's graph theory. Both
-read the same table of corner numbers, so that table is a shared assumption.
+read the same table of corner numbers, so that table is a shared assumption. Method C removes it:
+it rebuilds the 30 cubes from their face colourings, compares them with the table, and then solves
+every target by trying each cube in each corner of the $2\times2\times2$ block in each of its 24
+orientations; this count uses neither corner numbers nor graph theory. Along the way it checks that a
+cube fits a corner of the block exactly when it carries the target's corner number there, which is
+the rule methods A and B rely on.
 
 ---
 
@@ -73,7 +80,8 @@ python3 verify_graph_M.py
 ```
 
 Standard library only (no NumPy, no NetworkX), no network access, no randomness. Tested with
-Python 3.9.6 and 3.11.5; it runs in about 30 seconds on a laptop.
+Python 3.9.6 and 3.11.5; it runs in about 35 seconds on a laptop, of which method C takes
+under 10.
 
 Every check is a hard gate: a failure aborts the run with `VERIFICATION FAILED: …` and a non-zero
 exit status, and is a genuine disagreement with the paper worth reporting. (The gates are ordinary
@@ -93,13 +101,17 @@ Each command runs the full verification and prints the lines that state one clai
 | Table 2 | `python3 verify_graph_M.py \| sed -n '/^RESULT 3/,/^Total/p'` |
 | Both theorems, on every collection | `python3 verify_graph_M.py \| grep 'Total mismatches'` |
 | The $1{,}728$ and $24$ collections with $k = 0$ | `python3 verify_graph_M.py \| grep -A5 'tree with k=0'` |
+| The 30 cubes rebuilt from the colourings | `python3 verify_graph_M.py \| grep -A2 '^C1\.'` |
+| Table 2 and the 1/80 split for all 30 targets | `python3 verify_graph_M.py \| grep -A2 '^C2\.'` |
+| The 81 collections with solution number 16, and $72 = 6 \times 12$ | `python3 verify_graph_M.py \| grep -A3 '^C3\.'` |
+| The corollary's $p$ | `python3 verify_graph_M.py \| grep '^C4\.'` |
 
 ---
 
 ## What's here
 
 ```
-verify_graph_M.py                  The verifier: builds M, enumerates, cross-validates.
+verify_graph_M.py                  The verifier: builds M, enumerates, cross-validates (methods A, B, C).
 solution_number_distribution.csv   Expected output: the distribution by both methods.
 README.md                          This file.
 LICENSE                            Tiered: code MIT · documentation CC-BY 4.0 · data CC-BY 4.0.

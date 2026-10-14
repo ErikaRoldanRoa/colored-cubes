@@ -24,7 +24,14 @@ It reports:
      Theorem 2 -- the labels are the addresses, the numbers are not);
   3. agreement between methods A and B across all 203,490 collections;
   4. the two cases where the tree component has no edges (k = 0), which the
-     paper's lemmas cover and which are easy to overlook.
+     paper's lemmas cover and which are easy to overlook;
+  5. independent checks (method C) that do not use the corner-number table:
+     the 30 cubes rebuilt from the 720 face colourings and the 24 rotations,
+     compared with the table as sets of corner numbers; for all 30 targets, the
+     distribution of solution numbers, computed by placing coloured cubes in the
+     corners of the 2x2x2 block; the 1 + 80 split of the 81 collections with
+     solution number 16; the count 72 = 6 x 12; and the corollary's
+     p = 133680/5852925.
 
 The script is deterministic: no randomness, no network, no floating point, and
 no dependencies outside the Python standard library. Runtime is about 30 s.
@@ -35,8 +42,9 @@ def check(condition, message):
     if not condition:
         raise SystemExit("VERIFICATION FAILED: " + message)
 
-from itertools import combinations, product
+from itertools import combinations, permutations, product
 from collections import defaultdict, deque
+from fractions import Fraction
 from math import comb
 
 # ============================================================
@@ -280,6 +288,7 @@ cases_3comp_k0 = []
 cases_4comp_0223 = []
 cases_4comp_1222 = []
 all_4comp_ba = []
+sol16 = []   # (collection, contains Ba, number of components, k)
 
 total = 0
 for combo in combinations(all_21, 8):
@@ -295,6 +304,9 @@ for combo in combinations(all_21, 8):
 
     if sol_g != sol_b:
         mismatches.append((combo, sol_g, sol_b, ncomp, cdet, ntrees, ktree))
+
+    if sol_b == 16:
+        sol16.append((combo, ba_in, ncomp, ktree))
 
     if ba_in and sol_b > 0:
         edge_dist = sorted([ne for _,ne,_ in cdet])
@@ -442,6 +454,191 @@ match_direct = all(paper.get(sn,0) == dist_brute.get(sn,0) for sn in all_sns)
 print(f"  Paper distribution table == brute force? {match_direct}")
 check(match_direct, "Paper distribution table (SolnDist) does NOT match brute force. Did it drift?")
 
+# ============================================================
+# 7. INDEPENDENT CHECKS (method C)
+#    The 30 cubes are rebuilt from their face colourings, and every target is
+#    solved by placing coloured cubes in the corners of the 2x2x2 block. Nothing
+#    in C1, C2 and C4 reads the corner-number table above, except to compare
+#    with it at the end of C1.
+# ============================================================
+
+print("\n" + "="*70)
+print("INDEPENDENT CHECKS (method C: from the face colourings, all 30 targets)")
+print("="*70)
+
+# --- C1. The 30 MacMahon cubes, rebuilt -------------------------------------
+# A colouring lists the colours 1..6 of the faces in the directions of FACES.
+FACES = [(1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)]
+FACE_INDEX = {f: i for i, f in enumerate(FACES)}
+OCTANTS = list(product((1, -1), repeat=3))   # the 8 corners of a cube, and of the block
+
+def _det3(m):
+    return (m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+            - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+            + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]))
+
+# The rotations of the cube: the signed permutation matrices of determinant +1,
+# each written as the permutation it induces on the six face directions.
+FACE_PERMS = []
+for _p in permutations(range(3)):
+    for _s in product((1, -1), repeat=3):
+        _m = [[0] * 3 for _ in range(3)]
+        for _i in range(3):
+            _m[_i][_p[_i]] = _s[_i]
+        if _det3(_m) == 1:
+            FACE_PERMS.append(tuple(
+                FACE_INDEX[tuple(sum(_m[i][j] * f[j] for j in range(3)) for i in range(3))]
+                for f in FACES))
+check(len(set(FACE_PERMS)) == 24, f"expected 24 rotations of the cube, got {len(set(FACE_PERMS))}")
+
+def rotate(colouring, perm):
+    out = [0] * 6
+    for i in range(6):
+        out[perm[i]] = colouring[i]
+    return tuple(out)
+
+def corner_number(colouring, s):
+    """The colours around corner s, read clockwise as seen from outside the cube,
+    starting with the smallest."""
+    a = colouring[FACE_INDEX[(s[0], 0, 0)]]
+    b = colouring[FACE_INDEX[(0, s[1], 0)]]
+    c = colouring[FACE_INDEX[(0, 0, s[2])]]
+    if s[0] * s[1] * s[2] == 1:   # here x, y, z run counterclockwise
+        b, c = c, b
+    t = [a, b, c]
+    i = t.index(min(t))
+    return "".join(str(x) for x in t[i:] + t[:i])
+
+# All 6! = 720 colourings with six distinct colours, grouped into rotation classes.
+_classes = {}
+for _col in permutations(range(1, 7)):
+    _orbit = frozenset(rotate(_col, p) for p in FACE_PERMS)
+    _classes[min(_orbit)] = _orbit
+check(len(_classes) == 30, f"expected 30 rotation classes of the 720 colourings, got {len(_classes)}")
+check(all(len(o) == 24 for o in _classes.values()), "every rotation class must have 24 colourings")
+REBUILT = [sorted(_classes[r]) for r in sorted(_classes)]   # 30 cubes, each as its 24 colourings
+
+def corner_set(cube):
+    sets = {frozenset(corner_number(col, s) for s in OCTANTS) for col in cube}
+    check(len(sets) == 1, "corner numbers must not depend on how the cube is turned")
+    return next(iter(sets))
+
+rebuilt_sets = [corner_set(cube) for cube in REBUILT]
+table_sets = {frozenset(c) for c in ALL_CUBES.values()}
+check(len(set(rebuilt_sets)) == 30 and set(rebuilt_sets) == table_sets,
+      "the 30 cubes rebuilt from the colourings differ from the 30 cubes of the table")
+print("C1. 720 colourings / 24 rotations = 30 cubes; their corner-number sets equal the")
+print("    30 cubes of the table: PASS. (This checks the cubes as sets of corner numbers;")
+print("    it does not check which Conway name the table gives to each cube.)")
+
+# --- C2. Every target, solved by placing coloured cubes -----------------------
+# In the 2x2x2 block, the small cube at corner s shows its faces in the directions
+# s[0]x, s[1]y, s[2]z on the outside; they must carry the target's colours there.
+def fits(target, cube, s):
+    """Number of orientations in which `cube` can sit at corner s of the block."""
+    faces = [FACE_INDEX[(s[0], 0, 0)], FACE_INDEX[(0, s[1], 0)], FACE_INDEX[(0, 0, s[2])]]
+    return sum(1 for col in cube if all(col[f] == target[f] for f in faces))
+
+def solution_distribution(target_index):
+    """Distribution of solution numbers over all collections of eight cubes for one
+    target, split by whether the collection contains the target."""
+    target = REBUILT[target_index][0]
+    usable, masks = [], []
+    for j, cube in enumerate(REBUILT):
+        f = [fits(target, cube, s) for s in OCTANTS]
+        check(all(x in (0, 1) for x in f), "a cube fits a corner of the block in at most one way")
+        tcorners = [corner_number(target, s) for s in OCTANTS]
+        check(all((f[i] == 1) == (tcorners[i] in rebuilt_sets[j]) for i in range(8)),
+              "a cube fits a corner exactly when it carries the target's corner number there")
+        if any(f):
+            usable.append(j)
+            masks.append(sum(1 << i for i in range(8) if f[i]))
+    dist = defaultdict(int)
+    with_target = defaultdict(int)
+    t_pos = usable.index(target_index)
+
+    # Choose the cubes one at a time; ways[used] counts the placements of the cubes
+    # chosen so far into the set `used` of corners. A branch whose cubes cannot all
+    # be placed is abandoned, since every collection extending it has no solution.
+    def extend(start, depth, ways, has_target):
+        if depth == 8:
+            sol = ways.get(255, 0)
+            if sol:
+                dist[sol] += 1
+                if has_target:
+                    with_target[sol] += 1
+            return
+        for j in range(start, len(usable) - (8 - depth) + 1):
+            new = {}
+            for used, w in ways.items():
+                free = masks[j] & ~used
+                while free:
+                    bit = free & -free
+                    free ^= bit
+                    new[used | bit] = new.get(used | bit, 0) + w
+            if new:
+                extend(j + 1, depth + 1, new, has_target or j == t_pos)
+
+    extend(0, 0, {0: 1}, False)
+    return len(usable), dict(dist), dict(with_target)
+
+_bad_targets = []
+for _t in range(30):
+    _nu, _d, _w = solution_distribution(_t)
+    if not (_nu == 21 and _d == paper and _w.get(16, 0) == 80 and _d[16] - _w.get(16, 0) == 1):
+        _bad_targets.append((_t, _nu, _d, _w))
+check(not _bad_targets,
+      f"{len(_bad_targets)} target(s) do not reproduce Table 2 and the 1/80 split, "
+      f"first: {_bad_targets[:1]}")
+print("C2. For each of the 30 targets: 21 usable cubes, and the distribution of solution")
+print("    numbers equals Table 2; of its 81 collections with solution number 16, 1 avoids")
+print("    the target and 80 contain it: PASS (all 30 targets).")
+
+# --- C3. The 81 collections with solution number 16, for the target Ba --------
+# (From the enumeration above and the graph M.)
+diagonal_pairs = sorted(sorted(c) for c in edge_to_cubes.values() if len(c) == 2)
+diagonals = sorted(c for pair in diagonal_pairs for c in pair)
+sol16_without = [c for c, has_ba, _, _ in sol16 if not has_ba]
+sol16_n4 = [c for c, has_ba, n, k in sol16 if has_ba and n == 4 and k == 1]
+sol16_n3 = [c for c, has_ba, n, k in sol16 if has_ba and n == 3 and k == 3]
+check(len(sol16) == 81, f"expected 81 collections with solution number 16, found {len(sol16)}")
+check(len(sol16_without) == 1 and sorted(sol16_without[0]) == diagonals,
+      f"expected exactly one collection without Ba, the four diagonal pairs; found {sol16_without}")
+check(len(sol16_n4) == 8 and len(sol16_n3) == 72 and len(sol16_n4) + len(sol16_n3) == 80,
+      f"expected 80 = 8 + 72 collections with Ba, found {len(sol16_n4)} + {len(sol16_n3)}")
+
+# The paper's count of the 72: two of the four diagonal pairs (6 ways), then a path
+# of three cubes spanning the other four corner numbers (12 ways for each choice).
+_built72 = set()
+_paths_per_choice = []
+for _two in combinations(diagonal_pairs, 2):
+    _rest = BA_CORNERS - set().union(*(edges[p[0]] for p in _two))
+    _inside = sorted(c for c in edges if edges[c] <= _rest)
+    _n_paths = 0
+    for _three in combinations(_inside, 3):
+        _es = [edges[c] for c in _three]
+        _deg = [sum(v in e for e in _es) for v in _rest]
+        if len(set(_es)) == 3 and min(_deg) >= 1 and max(_deg) <= 2:
+            _n_paths += 1
+            _built72.add(tuple(sorted(list(_two[0]) + list(_two[1]) + list(_three) + ['Ba'])))
+    _paths_per_choice.append(_n_paths)
+check(len(_paths_per_choice) == 6 and _paths_per_choice == [12] * 6,
+      f"expected 12 spanning paths for each of the 6 choices, got {_paths_per_choice}")
+check(_built72 == {tuple(sorted(c)) for c in sol16_n3},
+      "the 72 collections built as two diagonal pairs + a spanning path + Ba differ from "
+      "the 72 found by the enumeration")
+print("C3. Target Ba: 81 collections with solution number 16 = 1 without Ba (the four")
+print(f"    diagonal pairs {', '.join(diagonals)}) + 8 with four components + 72 with")
+print("    three components; 72 = 6 x 12 (two diagonal pairs, then a spanning path of")
+print("    three cubes), and these are exactly the 72 found: PASS.")
+
+# --- C4. The corollary ----------------------------------------------------------
+p_build = Fraction(sum(paper.values()), comb(30, 8))
+check(sum(paper.values()) == 133680 and comb(30, 8) == 5852925,
+      "the corollary uses 133,680 solvable collections out of C(30,8) = 5,852,925")
+check(f"{float(p_build):.4f}" == "0.0228", f"p = {float(p_build)} does not round to 0.0228")
+print(f"C4. p = 133680/5852925 = {p_build} = {float(p_build):.6f}, about 0.0228: PASS.")
+
 print("\n" + "="*70)
 # ============================================================
 # Emit the machine-readable data behind the paper's distribution table,
@@ -489,4 +686,12 @@ print(f"""
 5. CROSS-VALIDATION: graph-theoretic formulas vs the prime-product brute force of
    arXiv:2407.13208, over all {total:,} usable-for-Ba collections.
    Mismatches: {len(mismatches)}.
+
+6. INDEPENDENT CHECKS (method C), all asserted above:
+   - the 30 cubes rebuilt from the 720 colourings equal the table's 30 cubes
+     as sets of corner numbers (the Conway names are not checked);
+   - all 30 targets give the distribution of Table 2, and for each, 1 of its
+     81 collections with solution number 16 avoids the target and 80 contain it;
+   - for Ba: 81 = 1 + 8 + {len(sol16_n3)}, with {len(sol16_n3)} = 6 x 12;
+   - p = 133680/5852925 = {float(p_build):.4f}.
 """)

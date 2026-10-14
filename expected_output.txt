@@ -1,0 +1,185 @@
+======================================================================
+GRAPH M STRUCTURE
+======================================================================
+Vertices: 8 — ['123', '134', '146', '162', '253', '265', '354', '456']
+Edges (cubes): 20
+Distinct vertex pairs: 16
+Bipartite: True
+  Partition A: ['123', '146', '265', '354']
+  Partition B: ['134', '162', '253', '456']
+Vertex degrees: {'123': 5, '134': 5, '146': 5, '162': 5, '253': 5, '265': 5, '354': 5, '456': 5}
+
+All 20 edges:
+  Ac : 134 -- 265
+  Ad : 123 -- 456
+  Ae : 162 -- 354
+  Af : 146 -- 253
+  Cb : 134 -- 265
+  Cd : 146 -- 162
+  Ce : 123 -- 253
+  Cf : 354 -- 456
+  Db : 123 -- 456
+  Dc : 253 -- 354
+  De : 134 -- 146
+  Df : 162 -- 265
+  Eb : 162 -- 354
+  Ec : 146 -- 456
+  Ed : 253 -- 265
+  Ef : 123 -- 134
+  Fb : 146 -- 253
+  Fc : 123 -- 162
+  Fd : 134 -- 354
+  Fe : 265 -- 456
+
+Multi-edges (pairs sharing same two corners):
+  ['123', '456']: ['Ad', 'Db']
+  ['134', '265']: ['Ac', 'Cb']
+  ['146', '253']: ['Af', 'Fb']
+  ['162', '354']: ['Ae', 'Eb']
+
+Structural assertions on M: PASS (8 vertices, 20 edges, 4 parallel pairs, bipartite, 5-regular).
+Cube-data assertions: PASS (30 cubes; usable corner count 8 for Ba, 0 or 2 for the rest; 9 unusable, 20 usable).
+
+======================================================================
+ENUMERATING ALL COLLECTIONS
+======================================================================
+C(30,8) = 5852925
+C(21,8) = 203490 (only usable cubes for Ba)
+  Processed 50000...
+  Processed 100000...
+  Processed 150000...
+  Processed 200000...
+
+======================================================================
+RESULT 1: BRUTE-FORCE DISTRIBUTION (ground truth)
+======================================================================
+Total non-zero: 133680
+  Solution number   2:  93000
+  Solution number   4:  15987
+  Solution number   6:   2664
+  Solution number   8:  19860
+  Solution number  10:    792
+  Solution number  12:   1296
+  Solution number  16:     81
+
+======================================================================
+RESULT 2: GRAPH FORMULA DISTRIBUTION
+======================================================================
+Total non-zero: 133680
+  Solution number   2:  93000
+  Solution number   4:  15987
+  Solution number   6:   2664
+  Solution number   8:  19860
+  Solution number  10:    792
+  Solution number  12:   1296
+  Solution number  16:     81
+
+======================================================================
+RESULT 3: COMPARISON WITH TABLE 1 IN PAPER
+======================================================================
+ Sol#    Paper   BruteF    Graph  Paper=BF  Paper=Gr
+----- -------- -------- -------- --------- ---------
+    2    93000    93000    93000       YES       YES
+    4    15987    15987    15987       YES       YES
+    6     2664     2664     2664       YES       YES
+    8    19860    19860    19860       YES       YES
+   10      792      792      792       YES       YES
+   12     1296     1296     1296       YES       YES
+   16       81       81       81       YES       YES
+Total   133680   133680   133680
+
+======================================================================
+RESULT 4: GRAPH vs BRUTE FORCE MISMATCHES
+======================================================================
+Total mismatches: 0
+
+======================================================================
+RESULT 5: THE ZERO-EDGE TREE CASES (k = 0)
+======================================================================
+A tree component with no edges is a single vertex, occupied by the target
+Ba itself. These cases contribute the factor k+1 = 1 and are the easiest to
+overlook, so they are checked here explicitly against the paper's lemmas.
+
+--- Three components, tree with k=0 ---
+Paper's Lemma wTarget3components: solution number = 4(k+1), so 4 when k=0.
+Collections found: 1728
+Prime-product brute force gives: {4}
+Agrees with 4(0+1) = 4 on every collection? True
+Example: ('Ac', 'Ad', 'Ae', 'Cb', 'Cd', 'Cf', 'Db', 'Ba')
+  Components (vertices, edges, is_tree): [(5, 5, False), (2, 2, False), (1, 0, True)]
+
+--- Four components, tree with k=1, distribution (1,2,2,2) ---
+Paper's Lemma wTfourcomponents: solution number = 8(k+1), so 16 when k=1.
+Collections found: 8
+Prime-product brute force gives: {16}
+Agrees with 8(1+1) = 16 on every collection? True
+Example: ('Ac', 'Ad', 'Ae', 'Af', 'Cb', 'Db', 'Eb', 'Ba')
+  Components (vertices, edges, is_tree): [(2, 2, False), (2, 2, False), (2, 1, True), (2, 2, False)]
+
+--- Four components, tree with k=0, distribution (0,2,2,3) ---
+Paper's Lemma wTfourcomponents: solution number = 8(k+1), so 8 when k=0.
+Structure: Ba sits on the isolated vertex (1 way); two 2-cycles and one
+3-edge unicyclic component each contribute a factor of 2, giving 1*2*2*2 = 8.
+Collections found: 24
+Prime-product brute force gives: {8}
+Agrees with 8(0+1) = 8 on every collection? True
+Example: ('Ac', 'Ad', 'Ae', 'Cb', 'Cd', 'Db', 'Eb', 'Ba')
+  Components (vertices, edges, is_tree): [(2, 2, False), (2, 2, False), (3, 3, False), (1, 0, True)]
+
+--- ALL 4-component Ba-included collections ---
+Total: 32
+  Edge distribution (0, 2, 2, 3):
+    sol=8, trees=1: 24 collections
+  Edge distribution (1, 2, 2, 2):
+    sol=16, trees=1: 8 collections
+
+CONSISTENCY CHECK:
+  Paper distribution table == brute force? True
+
+======================================================================
+INDEPENDENT CHECKS (method C: from the face colourings, all 30 targets)
+======================================================================
+C1. 720 colourings / 24 rotations = 30 cubes; their corner-number sets equal the
+    30 cubes of the table: PASS. (This checks the cubes as sets of corner numbers;
+    it does not check which Conway name the table gives to each cube.)
+C2. For each of the 30 targets: 21 usable cubes, and the distribution of solution
+    numbers equals Table 2; of its 81 collections with solution number 16, 1 avoids
+    the target and 80 contain it: PASS (all 30 targets).
+C3. Target Ba: 81 collections with solution number 16 = 1 without Ba (the four
+    diagonal pairs Ac, Ad, Ae, Af, Cb, Db, Eb, Fb) + 8 with four components + 72 with
+    three components; 72 = 6 x 12 (two diagonal pairs, then a spanning path of
+    three cubes), and these are exactly the 72 found: PASS.
+C4. p = 133680/5852925 = 8912/390195 = 0.022840, about 0.0228: PASS.
+
+======================================================================
+
+Wrote solution_number_distribution.csv (7 solution numbers, 133,680 solvable collections).
+FINAL SUMMARY
+======================================================================
+
+1. GRAPH M: 8 vertices, 20 edges (cubes),
+   4 pairs of parallel edges, bipartite=True,
+   every vertex of degree 5. Asserted above.
+
+2. Distribution table of the paper (label SolnDist): reproduced on all 7 solution numbers?
+   True. Total solvable collections = 133,680.
+
+3. Lemma wTfourcomponents, solution number 8(k+1):
+   - k=0, distribution (0,2,2,3): 24 collections, all sol=8.
+   - k=1, distribution (1,2,2,2): 8 collections, all sol=16.
+
+4. Lemma wTarget3components, solution number 4(k+1):
+   - k=0, distribution (0,a,7-a), a in {2,3}: 1,728 collections, all sol=4.
+
+5. CROSS-VALIDATION: graph-theoretic formulas vs the prime-product brute force of
+   arXiv:2407.13208, over all 203,490 usable-for-Ba collections.
+   Mismatches: 0.
+
+6. INDEPENDENT CHECKS (method C), all asserted above:
+   - the 30 cubes rebuilt from the 720 colourings equal the table's 30 cubes
+     as sets of corner numbers (the Conway names are not checked);
+   - all 30 targets give the distribution of Table 2, and for each, 1 of its
+     81 collections with solution number 16 avoids the target and 80 contain it;
+   - for Ba: 81 = 1 + 8 + 72, with 72 = 6 x 12;
+   - p = 133680/5852925 = 0.0228.
+

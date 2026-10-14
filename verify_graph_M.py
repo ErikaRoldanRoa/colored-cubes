@@ -120,7 +120,7 @@ def check_bipartite(verts, edge_list):
         q = deque([s]); color[s] = 0
         while q:
             v = q.popleft()
-            for u in adj[v]:
+            for u in sorted(adj[v]):
                 if u not in color:
                     color[u] = 1 - color[v]; q.append(u)
                 elif color[u] == color[v]:
@@ -128,7 +128,7 @@ def check_bipartite(verts, edge_list):
     return True, {v for v,c in color.items() if c==0}, {v for v,c in color.items() if c==1}
 
 unique_edges_list = [(sorted(e)[0], sorted(e)[1]) for e in edge_to_cubes.keys()]
-is_bip, part0, part1 = check_bipartite(BA_CORNERS, unique_edges_list)
+is_bip, part0, part1 = check_bipartite(sorted(BA_CORNERS), sorted(unique_edges_list))
 
 print("="*70)
 print("GRAPH M STRUCTURE")
@@ -167,7 +167,7 @@ check(len(edges) == 20, f"M must have 20 edges, got {len(edges)}")
 check(n_parallel_pairs == 4, f"M must have 4 pairs of parallel edges, got {n_parallel_pairs}")
 check(is_bip, "M must be bipartite")
 check(all(degree[v] == 5 for v in BA_CORNERS),
-      f"every vertex of M must have degree 5, got {dict(degree)}")
+      f"every vertex of M must have degree 5, got {({v: degree[v] for v in sorted(degree)})}")
 
 # Every edge joins two DISTINCT corner numbers, so M is loopless by construction.
 # The substantive claim underneath that is about the cube data itself: for the target Ba,
@@ -197,16 +197,17 @@ def get_components(vertex_set, edge_frozensets):
         v1, v2 = list(e)
         adj[v1].add(v2); adj[v2].add(v1)
     visited = set(); components = []
-    for v in vertex_set:
+    for v in sorted(vertex_set):
         if v in visited: continue
         comp = set(); q = deque([v])
         while q:
             u = q.popleft()
             if u in visited: continue
             visited.add(u); comp.add(u)
-            for w in adj[u]:
+            for w in sorted(adj[u]):
                 if w not in visited and w in vertex_set: q.append(w)
         components.append(comp)
+    components.sort(key=min)
     return components
 
 def analyze_subgraph(cube_names, ba_included):

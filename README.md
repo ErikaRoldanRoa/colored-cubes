@@ -87,6 +87,13 @@ Every check is a hard gate: a failure aborts the run with `VERIFICATION FAILED: 
 exit status, and is a genuine disagreement with the paper worth reporting. (The gates are ordinary
 conditionals, not `assert`, so they are not removed by `python3 -O`.)
 
+The printed output is the same, byte for byte, on every run, under Python 3.9 and 3.11 and
+whatever the hash seed; `expected_output.txt` is a committed copy of it:
+
+```
+python3 verify_graph_M.py | diff - expected_output.txt
+```
+
 The run also writes **`solution_number_distribution.csv`**: the distribution by both methods
 alongside the published values. A committed copy of that file is the expected output.
 
@@ -113,6 +120,7 @@ Each command runs the full verification and prints the lines that state one clai
 ```
 verify_graph_M.py                  The verifier: builds M, enumerates, cross-validates (methods A, B, C).
 solution_number_distribution.csv   Expected output: the distribution by both methods.
+expected_output.txt                Expected output: everything the verifier prints.
 README.md                          This file.
 LICENSE                            Tiered: code MIT · documentation CC-BY 4.0 · data CC-BY 4.0.
 ```

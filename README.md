@@ -91,7 +91,7 @@ please report it (see below). (The gates are ordinary conditionals, not `assert`
 removed by `python3 -O`.)
 
 The printed output is the same, byte for byte, on every run, under Python 3.9 and 3.11 and
-whatever the hash seed; `expected_output.txt` is a committed copy of it:
+whatever the hash seed or locale; `expected_output.txt` is a committed copy of it:
 
 ```
 python3 verify_graph_M.py | diff - expected_output.txt

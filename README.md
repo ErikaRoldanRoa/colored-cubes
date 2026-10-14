@@ -150,7 +150,7 @@ dependency-free re-derivation of the claims in the paper above.
 ```bibtex
 @misc{johnson2024solutionnumbers,
   title         = {Solution Numbers for Eight Blocks to Madness Puzzle},
-  author        = {Inga Johnson and Erika Rold\'an},
+  author        = {Inga Johnson and Erika Roldan},
   year          = {2024},
   eprint        = {2407.13208},
   archivePrefix = {arXiv},
@@ -160,11 +160,8 @@ dependency-free re-derivation of the claims in the paper above.
 }
 ```
 
-The journal reference will replace this entry on publication.
-
-**This code.** A versioned release of this repository will be archived at publication, with a
-persistent identifier to cite. Until then, please cite the repository URL together with the commit
-you ran.
+**This code.** Please cite the repository URL together with the commit you ran
+(`git rev-parse HEAD`).
 
 ## Authors
 

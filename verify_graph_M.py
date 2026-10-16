@@ -19,17 +19,21 @@ It reports:
   1. the structure of M -- asserted, not merely printed;
   2. the distribution of solution numbers over the 133,680 solvable collections,
      compared against Table 2 of the paper (label SolnDist);
-  3. agreement between methods A and B across all 203,490 collections;
-  4. the two cases where the tree component has no edges (k = 0), which the
+  3. the same 133,680 collections by the shape of G_W: its number n of
+     components and, when Ba is in the collection, the number k of edges of its
+     tree component; the 17 counts are compared with the expected ones, and,
+     summed by solution number, they must give Table 2;
+  4. agreement between methods A and B across all 203,490 collections;
+  5. the two cases where the tree component has no edges (k = 0), which the
      paper's lemmas cover and which are easy to overlook;
-  5. method C, which does not use the corner-number table: the 30 cubes rebuilt
+  6. method C, which does not use the corner-number table: the 30 cubes rebuilt
      from the 720 face colorings and the 24 rotations, compared with the table
      as sets of corner numbers; and, for all 30 targets, the distribution of
      solution numbers (also over the collections containing the target, compared
      with methods A and B for Ba) and the 1 + 80 split of the 81 collections with
      solution number 16, computed by placing colored cubes in the corners of the
      2x2x2 block;
-  6. further counts for Ba, which use the table and M and are not part of
+  7. further counts for Ba, which use the table and M and are not part of
      method C (D1, D2 in the output): the 81 collections with solution number 16
      (1 + 8 + 72, with 72 = 6 x 12), and the corollary's p = 133680/5852925.
 
@@ -340,6 +344,7 @@ cases_4comp_0223 = []
 cases_4comp_1222 = []
 all_4comp_ba = []
 sol16 = []   # (collection, contains Ba, number of components, k)
+by_shape = defaultdict(int)   # solvable collections by (contains Ba, n, k; k is None without Ba)
 
 total = 0
 for combo in combinations(all_21, 8):
@@ -355,6 +360,9 @@ for combo in combinations(all_21, 8):
 
     if sol_g != sol_b:
         mismatches.append((combo, sol_g, sol_b, ncomp, cdet, ntrees, ktree))
+
+    if sol_b > 0:
+        by_shape[(ba_in, ncomp, ktree if ba_in else None)] += 1
 
     if sol_b == 16:
         sol16.append((combo, ba_in, ncomp, ktree))
@@ -511,6 +519,30 @@ print("CONSISTENCY CHECK:")
 match_direct = all(paper.get(sn,0) == dist_brute.get(sn,0) for sn in all_sns)
 print(f"  Table 2 of the paper == brute-force distribution? {match_direct}")
 check(match_direct, "Table 2 of the paper (label SolnDist) does not match the brute-force distribution")
+
+# The 133,680 solvable collections by the shape of G_W: its number n of components and,
+# when Ba is in the collection, the number k of edges of its tree component. Expected counts,
+# transcribed for comparison; key (contains Ba, n, k), with k = None when Ba is not in W.
+expected_shape = {(False, 1, None): 62472, (False, 2, None): 4679, (False, 3, None): 108,
+                  (False, 4, None): 1, (True, 1, 7): 17280,
+                  (True, 2, 0): 30528, (True, 2, 1): 9580, (True, 2, 2): 2664,
+                  (True, 2, 3): 1920, (True, 2, 4): 792, (True, 2, 5): 1200,
+                  (True, 3, 0): 1728, (True, 3, 1): 528, (True, 3, 2): 96, (True, 3, 3): 72,
+                  (True, 4, 0): 24, (True, 4, 1): 8}
+print()
+print("THE 133,680 SOLVABLE COLLECTIONS BY THE SHAPE OF G_W:")
+for has, n, k in sorted(by_shape, key=lambda s: (s[0], s[1], -1 if s[2] is None else s[2])):
+    label = f"Ba in W, n={n}, k={k}" if has else f"Ba not in W, n={n}"
+    print(f"  {label}: {by_shape[(has, n, k)]}")
+check(dict(by_shape) == expected_shape,
+      "the counts of the solvable collections by the shape of G_W are not the expected ones")
+# Each count has one solution number, 2^n without Ba and 2^(n-1)(k+1) with Ba.
+by_value = defaultdict(int)
+for (has, n, k), count in by_shape.items():
+    by_value[2**(n-1) * (k+1) if has else 2**n] += count
+check(all(by_value.get(sn, 0) == paper.get(sn, 0) for sn in all_sns) and set(by_value) <= set(all_sns),
+      "the counts by the shape of G_W, summed by solution number, do not give Table 2")
+print(f"  {len(by_shape)} counts, as expected; summed by solution number they give Table 2: PASS")
 
 # ============================================================
 # 7. METHOD C, AND FURTHER COUNTS FOR Ba

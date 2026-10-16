@@ -48,6 +48,7 @@ usable for $\mathrm{Ba}$: the 20 above together with $\mathrm{Ba}$ itself. ($\bi
 | The distribution of solution numbers over the $133{,}680$ solvable collections (Table 2 of the paper) | Full enumeration by the prime-product method, compared entry by entry; **checked** |
 | The theorem for target-free collections: solution number $= 2^{n}$ | Graph component/tree analysis vs. brute force on every collection; agreement is **checked** |
 | The theorem for target-containing collections: $8$, $2(k{+}1)$, $4(k{+}1)$, $8(k{+}1)$ for $n = 1,2,3,4$ | Graph component/tree analysis vs. brute force on every collection; agreement is **checked** |
+| The $133{,}680$ solvable collections by the shape of $G_W$: $n$ and, when $\mathrm{Ba}$ is in the collection, $k$ (17 counts) | Tallied over the full enumeration and compared count by count; summed by solution number ($2^n$, or $2^{n-1}(k+1)$ with $\mathrm{Ba}$), they must give Table 2; **checked** |
 | The three-component lemma at $k = 0$: exactly $1{,}728$ collections, with edge distributions $(0,2,5)$ and $(0,3,4)$, all with solution number $4$ | Filtered from the enumeration; the count, the edge distributions and the value are **checked** |
 | The four-component lemma at $k = 0$: exactly $24$ collections, all with solution number $8$ | Filtered from the enumeration; both the count and the value are **checked** |
 | **Method C (C1).** The 30 MacMahon cubes: rebuilt from all $6! = 720$ colorings with six distinct colors, up to the 24 rotations, they are exactly the 30 cubes of the table | Compared as sets of corner numbers; **checked**. This does not check the reading direction of corner numbers (reading them the other way turns each cube into its mirror cube, also one of the 30); the Conway names are checked only against the tableau, as in the third row. |
@@ -117,6 +118,7 @@ all at once, run `python3 verify_graph_M.py > run.txt` once and apply each filte
 | The Conway names fit the tableau | `python3 verify_graph_M.py \| grep -A3 'Conway-name assertions'` |
 | Table 2 | `python3 verify_graph_M.py \| sed -n '/^RESULT 3/,/^Total/p'` |
 | Both theorems, on every collection | `python3 verify_graph_M.py \| grep 'Total mismatches'` |
+| The collections by the shape of $G_W$ | `python3 verify_graph_M.py \| grep -A18 'BY THE SHAPE OF G_W'` |
 | The $1{,}728$ and $24$ collections with $k = 0$ | `python3 verify_graph_M.py \| grep -A7 'tree with k=0'` |
 | The 30 cubes rebuilt from the colorings | `python3 verify_graph_M.py \| grep -A4 '^C1\.'` |
 | Table 2 and the 1 + 80 split for all 30 targets | `python3 verify_graph_M.py \| grep -A4 '^C2\.'` |

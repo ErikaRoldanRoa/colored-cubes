@@ -144,6 +144,26 @@ Total: 32
 CONSISTENCY CHECK:
   Table 2 of the paper == brute-force distribution? True
 
+THE 133,680 SOLVABLE COLLECTIONS BY THE SHAPE OF G_W:
+  Ba not in W, n=1: 62472
+  Ba not in W, n=2: 4679
+  Ba not in W, n=3: 108
+  Ba not in W, n=4: 1
+  Ba in W, n=1, k=7: 17280
+  Ba in W, n=2, k=0: 30528
+  Ba in W, n=2, k=1: 9580
+  Ba in W, n=2, k=2: 2664
+  Ba in W, n=2, k=3: 1920
+  Ba in W, n=2, k=4: 792
+  Ba in W, n=2, k=5: 1200
+  Ba in W, n=3, k=0: 1728
+  Ba in W, n=3, k=1: 528
+  Ba in W, n=3, k=2: 96
+  Ba in W, n=3, k=3: 72
+  Ba in W, n=4, k=0: 24
+  Ba in W, n=4, k=1: 8
+  17 counts, as expected; summed by solution number they give Table 2: PASS
+
 ======================================================================
 METHOD C (C1, C2: from the face colorings) AND FURTHER COUNTS FOR Ba (D1, D2)
 ======================================================================
